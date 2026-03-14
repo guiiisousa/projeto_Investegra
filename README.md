@@ -1,2 +1,2 @@
 # INVESTEGRA
-Nosso projeto final
+Já percebeu como é difícil ficar migrando de conta em conta para olhar todos os seus investimentos ? Com o INVESTEGRA você tem tudo em uma interface só, desde seus investimentos, até mesmo aqueles que você pesquisa sobre. A partir de carteiras personalizadas por você mesmo, tendo em vista que poderá acompanhar, em tempo real, seus investimentos. Permitindo você analisar sobre os investimentos que te interessa, e sobre aqueles que não conhece tanto com o intuito de mostrar as características de qualquer tipo de investimento, como: renda fixa (CDB,LCI,Tesouro direto) e renda variável (FIIs,Ações,ETFs,Cripto). Além de calculadoras que facilitam os cálculos de seus investimentos: juros simples e compostos.
