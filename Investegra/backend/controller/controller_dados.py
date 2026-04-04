@@ -6,7 +6,6 @@ import os
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 )
-
 import Investegra.backend.config.config_pags as config_pags
 
 acesso = config_pags.Acesso()
@@ -17,6 +16,8 @@ def GetAcoes():
         
         soup = BeautifulSoup.BeautifulSoup(acesso.response_ações.text, 'html.parser')
         table = soup.find('table', {'id': 'resultado'})
+        
+        print(soup)
         
         if table:
             rows = table.find_all('tr')[1:]  # Ignorar o cabeçalho
@@ -57,7 +58,7 @@ def GetFiis():
                 data.append(cols)
            
             # Salvar os dados em um arquivo CSV
-            with open(f'Investegra/.env/fiis/Dados_Fiis.csv', 'w', newline='', encoding='utf-8') as f:
+            with open(f'Investegra/env/fiis/Dados_Fiis.csv', 'w', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
                 writer.writerow(['Código', 'Empresa', 'Setor', 'Preço', 'P/VP', 'DY'])
                 writer.writerows(data)
@@ -67,5 +68,3 @@ def GetFiis():
             print("Tabela de resultados não encontrada.")
     else:
         print(f"Erro: {acesso.response_fiis.status_code}")
-        
-GetAcoes()
