@@ -20,5 +20,5 @@ def RecarregarPagFundamentus_Fiis():
     acesso = Acesso()
     if acesso.response_fiis.status_code == 200:
         print("Página carregada com sucesso!")
-    else:
+    else: 
         print(f"Falha ao acessar. Código: {acesso.response_fiis.status_code}")

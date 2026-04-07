@@ -5,7 +5,7 @@ if __name__ == "__main__":
     # RecarregarPagFundamentus_Acoes()
     # RecarregarPagFundamentus_Fiis()
     GetAcoes()
-    # GetFiis()
-    ReadCSV_Acoes()
+    GetFiis()
+    # ReadCSV_Acoes()
     
     

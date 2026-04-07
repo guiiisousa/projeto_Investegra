@@ -7,8 +7,29 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 )
 import Investegra.backend.config.config_pags as config_pags
+import Investegra.backend.config.config_all as config_all
 
 acesso = config_pags.Acesso()
+agora = config_all.Paths.agora
+
+def ModificarCSV_Acoes():
+    with open(f'Investegra/env/ações/{agora}.csv', 'r', encoding='utf-8') as f:
+        conteudo = f.read()
+
+    conteudo = conteudo.replace(',"', ';"')
+
+    with open(f'Investegra/env/ações/{agora}.csv', 'w', encoding='utf-8') as f:
+        f.write(conteudo)
+
+def ModificarCSV_Fiis():
+    with open(f'Investegra/env/fiis/{agora}.csv', 'r', encoding='utf-8') as f:
+        conteudo = f.read()
+
+    conteudo = conteudo.replace(',"', ';"')
+    conteudo = conteudo.replace('1,', '1;')
+    
+    with open(f'Investegra/env/fiis/{agora}.csv', 'w', encoding='utf-8') as f:
+        f.write(conteudo)
 
 def GetAcoes():
     
@@ -26,20 +47,13 @@ def GetAcoes():
                 cols = [col.text.strip() for col in cols]
                 data.append(cols)
     
-            with open(f'Investegra/env/ações/Dados_Acoes.csv', 'w', newline='', encoding='utf-8') as f:
+            with open(f'Investegra/env/ações/{agora}.csv', 'w', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
                 writer.writerow(['Código', 'Cotação', 'P/L', 'P/VP', 'RSR', 'DY', 'P/Ativo', 'P/Cap.Giro', 'P/EBIT', 'P/ACL', 'EV/EBITDA', 'EV/EBIT', 'Mrg.Liq', 'Lig.Corr', 'ROIC', 'ROE', 'Liquidez 2 meses', 'Patrimonio Líquido', 'Dív. Bruta/Patrimonio', 'Cresc. Rec. 5a'])
                 writer.writerows(data)
                 
-            # with open('Investegra/env/ações/Dados_Acoes.csv', 'r', encoding='utf-8') as f:
-            #     conteudo = f.read()
-
-            # conteudo = conteudo.replace(',', ';')
-
-            # with open('Investegra/env/ações/Dados_Acoes.csv', 'w', encoding='utf-8') as f:
-            #     f.write(conteudo)
-            
             print("Dados do Fundamentus salvos com sucesso!")
+            ModificarCSV_Acoes()
         else:
             print("Tabela de resultados não encontrada.")
     else:
@@ -63,23 +77,25 @@ def GetFiis():
                 data.append(cols)
            
             
-            with open(f'Investegra/env/fiis/Dados_Fiis.csv', 'w', newline='', encoding='utf-8') as f:
+            with open(f'Investegra/env/fiis/{agora}.csv', 'w', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
                 writer.writerow(['Código', 'Empresa', 'Setor', 'Preço', 'P/VP', 'DY'])
                 writer.writerows(data)
             
             print("Dados do Fundamentus salvos com sucesso!")
+            ModificarCSV_Fiis()
         else:
             print("Tabela de resultados não encontrada.")
     else:
         print(f"Erro: {acesso.response_fiis.status_code}")
+        
         
 def ReadCSV_Acoes():
     acoes = []
     with open(f'Investegra/env/ações/Dados_Acoes.csv', 'r', encoding='utf-8') as f:
         
         for linha in f.readlines()[1:]:
-            Código,Cotação,P_L,P_VP,RSR,DY,P_Ativo,P_Cap_Giro,P_EBIT,P_ACL,EV_EBITDA,EV_EBIT,Mrg_Liq,Lig_Corr,ROIC,ROE,Liquidez_2_meses,Patrimonio_Líquido,Dív_Bruta_Patrimonio,Cresc_Rec_5a,_ = linha.strip().split(',')
+            Código,Cotação,P_L,P_VP,RSR,DY,P_Ativo,P_Cap_Giro,P_EBIT,P_ACL,EV_EBITDA,EV_EBIT,Mrg_Liq,Lig_Corr,ROIC,ROE,Liquidez_2_meses,Patrimonio_Líquido,Dív_Bruta_Patrimonio,Cresc_Rec_5a,_ = linha.strip().split(';')
             col = {
                 'Código': Código,
                 'Cotação': Cotação,
@@ -100,13 +116,8 @@ def ReadCSV_Acoes():
                 'Liquidez 2 meses': Liquidez_2_meses,
                 'Patrimonio Líquido': Patrimonio_Líquido,
                 'Dív. Bruta/Patrimonio': Dív_Bruta_Patrimonio,
-                'Cresc. Rec. 5a': Cresc_Rec_5a
+                'Cresc. Rec. 5a': Cresc_Rec_5a,
+                
             }
             acoes.append(col)
-            
     return acoes
-
-def ReadCSV_Fiis():
-    with open(f'Investegra/env/fiis/Dados_Fiis.csv', 'r', encoding='utf-8') as f:
-        for linha in f.readlines():
-            print(linha.strip().split(','))
