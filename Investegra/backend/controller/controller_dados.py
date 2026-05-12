@@ -8,6 +8,7 @@ from Investegra.env import classes
 from datetime import datetime
 import shutil
 
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
 acesso = classes.Acesso()
@@ -20,7 +21,7 @@ def GetAcoes():
         
         soup = BeautifulSoup.BeautifulSoup(acesso.response_ações.text, 'html.parser')
         table = soup.find('table', {'id': 'resultado'})
-        
+        print(table)
         if table:
             rows = table.find_all('tr')[1:] 
             data = []
@@ -187,5 +188,21 @@ def ArmazenarAcoes_Mensal():
                     print(f"Arquivo {arquivo} movido para {caminho_final}")
                 case _ :
                     print(f"Arquivo {arquivo} não corresponde ao critério de movimentação.")
-              
-              
+                    
+def ArmazenarAcoes_Diario():
+    pasta = "Investegra/env/ações"
+    pasta_destino = "Investegra/env/ações/dia"
+    
+    for arquivo in os.listdir(pasta):
+        if arquivo.endswith(".csv"):
+        
+            data_str = arquivo.split("-")[1]
+            dia = int(data_str)
+            
+            match dia:
+                case 5 : 
+                    caminho_final = shutil.move(f'{pasta}/{arquivo}', f'{pasta_destino}/{arquivo}')
+                    print(f"Arquivo {arquivo} movido para {caminho_final}")
+                case _ :
+                    print(f"Arquivo {arquivo} não corresponde ao critério de movimentação.")
+                    
