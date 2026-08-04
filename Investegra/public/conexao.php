@@ -3,8 +3,8 @@
 $conn = new mysqli(
     "localhost",
     "root",
-    "Beto2009!",
-    "Projeto_Final"
+    "cefet123",
+    "projeto_final"
 );
 
 if ($conn->connect_error) {

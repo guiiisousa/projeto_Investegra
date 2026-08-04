@@ -1,6 +1,6 @@
 import bs4 as BeautifulSoup
 import csv
-from acesso import Acesso
+from utils.acesso import Acesso
 from config import config_pags, config_all
 from python.utils import acesso
 
