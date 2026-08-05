@@ -1,5 +1,5 @@
-CREATE DATABASE Projeto_Final;
-USE Projeto_Final;
+CREATE DATABASE Investegra;
+USE Investegra;
  
 CREATE TABLE usuarios (
 id INT AUTO_INCREMENT PRIMARY KEY,

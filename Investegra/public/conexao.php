@@ -1,14 +1,12 @@
 <?php
 
 $conn = new mysqli(
-    "localhost",
+    "investegra",
     "root",
-    "cefet123",
-    "projeto_final"
+    "123456",
+    "investegra"
 );
 
-if ($conn->connect_error) {
-    die("Erro: " . $conn->connect_error);
-}
+if ($conn->connect_error) {die("Erro: " . $conn->connect_error);}
 
 ?>
