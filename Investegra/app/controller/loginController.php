@@ -54,6 +54,6 @@ class LoginController
     public function index()
     {
         require __DIR__ .
-            '/../../views/login/index.php';
+            '/../views/login/login.php';
     }
 }

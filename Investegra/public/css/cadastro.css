@@ -1,0 +1,212 @@
+
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family:'Segoe UI',sans-serif;
+    }
+
+    body{
+
+        background:#f6f8fa;
+
+        display:flex;
+        justify-content:center;
+        align-items:center;
+
+        min-height:100vh;
+
+        padding:20px;
+    }
+
+    .container{
+
+        width:480px;
+
+        background:#ffffff;
+
+        padding:40px;
+
+        border-radius:24px;
+
+        box-shadow:
+        0 15px 35px rgba(0,0,0,.08);
+
+        animation:fadeIn .5s ease;
+    }
+
+    .logo{
+
+        text-align:center;
+
+        margin-bottom:30px;
+    }
+
+    .logo h1{
+
+        color:#00a86b;
+
+        font-size:2rem;
+
+        margin-bottom:8px;
+    }
+
+    .logo p{
+
+        color:#6b7280;
+
+        font-size:14px;
+    }
+
+    h2{
+
+        text-align:center;
+
+        margin-bottom:25px;
+
+        color:#1f2937;
+
+        font-size:1.5rem;
+    }
+
+    input,
+    select{
+
+        width:100%;
+
+        padding:14px;
+
+        border:1px solid #d1d5db;
+
+        border-radius:12px;
+
+        font-size:15px;
+
+        background:#fff;
+
+        transition:.3s;
+    }
+
+    input:focus,
+    select:focus{
+
+        outline:none;
+
+        border-color:#00a86b;
+
+        box-shadow:
+        0 0 0 4px rgba(0,168,107,.12);
+    }
+
+    .campo{
+
+        margin-bottom:15px;
+    }
+
+    .senha-container{
+
+        position:relative;
+    }
+
+    .senha-container input{
+
+        padding-right:55px;
+    }
+
+    .mostrar-senha{
+
+        position:absolute;
+
+        right:15px;
+
+        top:50%;
+
+        transform:translateY(-50%);
+
+        background:none;
+
+        border:none;
+
+        cursor:pointer;
+
+        font-size:18px;
+
+        color:#6b7280;
+
+        width:auto;
+
+        padding:0;
+    }
+
+    .mostrar-senha:hover{
+
+        background:none;
+    }
+
+    button[type="submit"]{
+
+        width:100%;
+
+        padding:15px;
+
+        border:none;
+
+        border-radius:12px;
+
+        background:#00a86b;
+
+        color:white;
+
+        font-size:16px;
+
+        font-weight:600;
+
+        cursor:pointer;
+
+        transition:.3s;
+    }
+
+    button[type="submit"]:hover{
+
+        background:#00915d;
+
+        transform:translateY(-2px);
+    }
+
+    .footer-link{
+
+        margin-top:25px;
+
+        text-align:center;
+
+        color:#6b7280;
+    }
+
+    .footer-link a{
+
+        color:#00a86b;
+
+        text-decoration:none;
+
+        font-weight:600;
+    }
+
+    .footer-link a:hover{
+
+        text-decoration:underline;
+    }
+
+    @keyframes fadeIn{
+
+        from{
+
+            opacity:0;
+            transform:translateY(20px);
+        }
+
+        to{
+
+            opacity:1;
+            transform:translateY(0);
+        }
+    }
