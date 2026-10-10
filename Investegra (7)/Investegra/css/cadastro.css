@@ -1,0 +1,133 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+
+    background: #f4fdf7;
+
+    min-height: 100vh;
+}
+
+.container {
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 30px 20px;
+}
+
+.card {
+    width: 100%;
+
+    max-width: 500px;
+
+    background: white;
+
+    padding: 35px;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.logo {
+    text-align: center;
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+    color: #00a86b;
+
+    margin-bottom: 20px;
+}
+
+h1 {
+    text-align: center;
+
+    margin-bottom: 10px;
+}
+
+.subtitulo {
+    text-align: center;
+
+    color: #666;
+
+    line-height: 1.5;
+
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+
+    font-weight: bold;
+
+    margin-bottom: 7px;
+}
+
+input,
+select {
+    width: 100%;
+
+    padding: 12px;
+
+    margin-bottom: 18px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 7px;
+
+    font-size: 15px;
+
+    background: white;
+}
+
+button {
+    width: 100%;
+
+    padding: 13px;
+
+    background: #00a86b;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 7px;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.rodape {
+    text-align: center;
+
+    margin-top: 22px;
+
+    color: #666;
+}
+
+a {
+    color: #00a86b;
+
+    font-weight: bold;
+
+    text-decoration: none;
+}

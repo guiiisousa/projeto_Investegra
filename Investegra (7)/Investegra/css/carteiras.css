@@ -1,0 +1,918 @@
+/* =========================================================
+   INVESTEGRA - CARTEIRAS
+   ========================================================= */
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   BASE
+   ========================================================= */
+
+body {
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: #f4f7f6;
+
+    color: #1f2933;
+
+    min-height: 100vh;
+}
+
+
+a {
+    text-decoration: none;
+}
+
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+/* =========================================================
+   CONTAINER
+   ========================================================= */
+
+.container {
+    width: min(1400px, 94%);
+
+    margin: 0 auto;
+
+    padding: 35px 0 60px;
+}
+
+
+/* =========================================================
+   CABEÇALHO
+   ========================================================= */
+
+.topo {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 30px;
+
+    margin-bottom: 35px;
+}
+
+
+.topo h1 {
+    font-size: 32px;
+
+    font-weight: 700;
+
+    letter-spacing: -0.5px;
+
+    color: #17211d;
+
+    margin-bottom: 7px;
+}
+
+
+.topo p {
+    color: #6b7772;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   BOTÃO PRINCIPAL
+   ========================================================= */
+
+.btn-principal {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    min-height: 42px;
+
+    padding: 0 18px;
+
+    border-radius: 9px;
+
+    background: #00a86b;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    border: 1px solid #00a86b;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.btn-principal:hover {
+    background: #008f5a;
+
+    border-color: #008f5a;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 14px rgba(0, 168, 107, 0.20);
+}
+
+
+/* =========================================================
+   LISTA DE CARTEIRAS
+   ========================================================= */
+
+.lista-carteiras {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 22px;
+}
+
+
+/* =========================================================
+   CARD DA CARTEIRA
+   ========================================================= */
+
+.card-carteira {
+    background: #ffffff;
+
+    border: 1px solid #e6ece9;
+
+    border-radius: 16px;
+
+    padding: 25px;
+
+    box-shadow:
+        0 4px 18px rgba(25, 45, 37, 0.055);
+
+    transition:
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.card-carteira:hover {
+    box-shadow:
+        0 8px 25px rgba(25, 45, 37, 0.08);
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   CABEÇALHO DA CARTEIRA
+   ========================================================= */
+
+.cabecalho-carteira {
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 25px;
+
+    padding-bottom: 22px;
+
+    border-bottom: 1px solid #edf1ef;
+}
+
+
+.cabecalho-carteira h2 {
+    font-size: 23px;
+
+    font-weight: 700;
+
+    color: #18221e;
+
+    line-height: 1.2;
+
+    margin-bottom: 7px;
+}
+
+
+.cabecalho-carteira p {
+    color: #74807b;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    max-width: 650px;
+}
+
+
+/* =========================================================
+   AÇÕES DA CARTEIRA
+   ========================================================= */
+
+.acoes-carteira {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    flex-shrink: 0;
+}
+
+
+.btn-editar,
+.btn-excluir,
+.btn-ver {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 36px;
+
+    padding: 0 13px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.btn-editar {
+    background: #eef6ff;
+
+    color: #2878c8;
+}
+
+
+.btn-editar:hover {
+    background: #dceeff;
+
+    transform: translateY(-1px);
+}
+
+
+.btn-excluir {
+    background: #fff0f0;
+
+    color: #d64545;
+}
+
+
+.btn-excluir:hover {
+    background: #ffe0e0;
+
+    transform: translateY(-1px);
+}
+
+
+.btn-ver {
+    background: #e9f8f1;
+
+    color: #008f5a;
+}
+
+
+.btn-ver:hover {
+    background: #d9f2e8;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   RESUMO DA CARTEIRA
+   ========================================================= */
+
+.resumo-carteira {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-top: 22px;
+}
+
+
+.informacao-carteira {
+    min-width: 0;
+
+    padding: 16px;
+
+    border-radius: 11px;
+
+    background: #f7f9f8;
+
+    border: 1px solid #edf1ef;
+}
+
+
+.informacao-carteira span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #75807c;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+.informacao-carteira strong {
+    display: block;
+
+    color: #202925;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* Destaque para valor atual */
+
+.informacao-carteira.destaque {
+    background: #f0faf5;
+
+    border-color: #d5eee2;
+
+    position: relative;
+
+    overflow: hidden;
+}
+
+
+.informacao-carteira.destaque::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    top: 0;
+
+    bottom: 0;
+
+    width: 3px;
+
+    background: #00a86b;
+}
+
+
+.informacao-carteira.destaque strong {
+    color: #007c50;
+}
+
+
+/* =========================================================
+   RESULTADOS
+   ========================================================= */
+
+.resultado-positivo {
+    color: #008f5a !important;
+}
+
+
+.resultado-negativo {
+    color: #d64545 !important;
+}
+
+
+.indisponivel {
+    color: #929b97 !important;
+
+    font-weight: 500 !important;
+}
+
+
+/* =========================================================
+   SEÇÃO DE ATIVOS
+   ========================================================= */
+
+.ativos-carteira {
+    margin-top: 27px;
+
+    padding-top: 23px;
+
+    border-top: 1px solid #edf1ef;
+}
+
+
+.ativos-carteira h3 {
+    font-size: 17px;
+
+    color: #27332e;
+
+    margin-bottom: 13px;
+}
+
+
+/* =========================================================
+   LISTA DE ATIVOS
+   ========================================================= */
+
+.lista-ativos-carteira {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+/* =========================================================
+   LINHA DE ATIVO
+   ========================================================= */
+
+.linha-ativo {
+    display: grid;
+
+    grid-template-columns:
+        minmax(140px, 1.4fr)
+        repeat(4, minmax(110px, 1fr))
+        auto;
+
+    align-items: center;
+
+    gap: 18px;
+
+    padding: 15px 16px;
+
+    background: #fafbfb;
+
+    border: 1px solid #edf1ef;
+
+    border-radius: 10px;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.linha-ativo:hover {
+    background: #f5faf8;
+
+    border-color: #dbece4;
+}
+
+
+/* =========================================================
+   IDENTIFICAÇÃO DO ATIVO
+   ========================================================= */
+
+.ativo-identificacao {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+    min-width: 0;
+}
+
+
+.ativo-identificacao strong {
+    color: #1d2924;
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+
+.ativo-identificacao span {
+    display: inline-block;
+
+    width: fit-content;
+
+    max-width: 100%;
+
+    padding: 3px 8px;
+
+    border-radius: 20px;
+
+    background: #e9f8f1;
+
+    color: #008f5a;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   DADOS DO ATIVO
+   ========================================================= */
+
+.ativo-dado {
+    min-width: 0;
+}
+
+
+.ativo-dado span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #858f8b;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+.ativo-dado strong {
+    display: block;
+
+    color: #303a36;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   BOTÃO VER
+   ========================================================= */
+
+.linha-ativo .btn-ver {
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   AVISO DE COTAÇÃO
+   ========================================================= */
+
+.aviso-cotacao {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 10px;
+
+    margin-top: 17px;
+
+    padding: 13px 15px;
+
+    border-radius: 9px;
+
+    background: #fffaf0;
+
+    border: 1px solid #f2e6c9;
+
+    color: #756644;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+
+.aviso-cotacao::before {
+    content: "ⓘ";
+
+    color: #a27a28;
+
+    font-size: 14px;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   RODAPÉ DA CARTEIRA
+   ========================================================= */
+
+.rodape-carteira {
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-top: 20px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #edf1ef;
+}
+
+
+/* =========================================================
+   ESTADO VAZIO
+   ========================================================= */
+
+.estado-vazio {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 350px;
+
+    padding: 45px 25px;
+
+    text-align: center;
+
+    background: #ffffff;
+
+    border: 1px solid #e6ece9;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 18px rgba(25, 45, 37, 0.055);
+}
+
+
+.estado-vazio h2 {
+    color: #26312d;
+
+    font-size: 22px;
+
+    margin-bottom: 9px;
+}
+
+
+.estado-vazio p {
+    max-width: 450px;
+
+    color: #7a8580;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    margin-bottom: 22px;
+}
+
+
+/* =========================================================
+   RESPONSIVIDADE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .container {
+        width: min(1100px, 94%);
+    }
+
+
+    .resumo-carteira {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+
+    .linha-ativo {
+        grid-template-columns:
+            1.5fr
+            repeat(2, 1fr)
+            auto;
+    }
+
+
+    .linha-ativo .ativo-dado:nth-of-type(3),
+    .linha-ativo .ativo-dado:nth-of-type(4) {
+        display: none;
+    }
+}
+
+
+@media (max-width: 850px) {
+
+    .topo {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .topo .btn-principal {
+        width: 100%;
+    }
+
+
+    .cabecalho-carteira {
+        flex-direction: column;
+    }
+
+
+    .acoes-carteira {
+        width: 100%;
+    }
+
+
+    .acoes-carteira a {
+        flex: 1;
+    }
+
+
+    .resumo-carteira {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .linha-ativo {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 13px;
+    }
+
+
+    .linha-ativo .ativo-identificacao {
+        grid-column: 1 / -1;
+
+        padding-bottom: 8px;
+
+        border-bottom: 1px solid #e9eeec;
+    }
+
+
+    .linha-ativo .btn-ver {
+        grid-column: 1 / -1;
+
+        width: 100%;
+    }
+
+
+    .linha-ativo .ativo-dado:nth-of-type(3),
+    .linha-ativo .ativo-dado:nth-of-type(4) {
+        display: block;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .container {
+        width: 92%;
+
+        padding-top: 25px;
+    }
+
+
+    .topo {
+        margin-bottom: 25px;
+    }
+
+
+    .topo h1 {
+        font-size: 27px;
+    }
+
+
+    .card-carteira {
+        padding: 18px;
+    }
+
+
+    .resumo-carteira {
+        grid-template-columns: 1fr;
+    }
+
+
+    .informacao-carteira strong {
+        font-size: 17px;
+    }
+
+
+    .acoes-carteira {
+        flex-direction: column;
+    }
+
+
+    .acoes-carteira a {
+        width: 100%;
+    }
+
+
+    .linha-ativo {
+        grid-template-columns: 1fr;
+
+        padding: 14px;
+    }
+
+
+    .linha-ativo .ativo-dado {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 15px;
+
+        padding-bottom: 8px;
+
+        border-bottom: 1px solid #edf1ef;
+    }
+
+
+    .linha-ativo .ativo-dado span {
+        margin-bottom: 0;
+    }
+
+
+    .linha-ativo .ativo-dado strong {
+        text-align: right;
+    }
+
+
+    .linha-ativo .btn-ver {
+        margin-top: 3px;
+    }
+
+
+    .rodape-carteira {
+        justify-content: stretch;
+    }
+
+
+    .rodape-carteira .btn-principal {
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 400px) {
+
+    .container {
+        width: 94%;
+    }
+
+
+    .card-carteira {
+        padding: 15px;
+    }
+
+
+    .cabecalho-carteira h2 {
+        font-size: 20px;
+    }
+
+
+    .informacao-carteira {
+        padding: 14px;
+    }
+
+}
