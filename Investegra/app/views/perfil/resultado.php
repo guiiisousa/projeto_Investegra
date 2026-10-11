@@ -1,504 +1,145 @@
+<?php
+$escape = static function ($value): string {
+    return htmlspecialchars((string) ($value ?? ""), ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8");
+};
+
+$experienciaLabel = [
+    "Nenhuma" => "Nenhuma",
+    "Baixa" => "Baixa",
+    "Media" => "Média",
+    "Alta" => "Alta",
+][$experiencia] ?? $experiencia;
+
+$horizonteLabel = [
+    "Curto" => "Curto prazo",
+    "Medio" => "Médio prazo",
+    "Longo" => "Longo prazo",
+][$horizonte] ?? $horizonte;
+
+$toleranciaLabel = [
+    "Baixa" => "Baixa",
+    "Media" => "Média",
+    "Alta" => "Alta",
+][$tolerancia] ?? $tolerancia;
+
+$objetivoLabel = [
+    "Preservacao" => "Preservação do patrimônio",
+    "Reserva" => "Formação de reserva",
+    "Crescimento" => "Crescimento do patrimônio",
+    "Longo_Prazo" => "Investimento de longo prazo",
+][$objetivo] ?? str_replace("_", " ", $objetivo);
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Resultado do Perfil - INVESTEGRA</title>
-
-    <style>
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4fdf7;
-            color: #333;
-            min-height: 100vh;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 40px auto;
-        }
-
-        .cabecalho {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .cabecalho h1 {
-            color: #00a86b;
-            margin-bottom: 10px;
-        }
-
-        .cabecalho p {
-            color: #666;
-            font-size: 16px;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Card principal
-        |--------------------------------------------------------------------------
-        */
-
-        .resultado-principal {
-            background: white;
-            border-radius: 15px;
-            padding: 35px;
-            text-align: center;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-            margin-bottom: 25px;
-        }
-
-        .resultado-principal h2 {
-            color: #555;
-            margin-bottom: 20px;
-        }
-
-        .perfil {
-            display: inline-block;
-            padding: 15px 35px;
-            border-radius: 30px;
-            background: #e8f8f1;
-            color: #00a86b;
-            font-size: 26px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .score {
-            font-size: 18px;
-            color: #555;
-            margin-bottom: 20px;
-        }
-
-        .score strong {
-            color: #00a86b;
-            font-size: 22px;
-        }
-
-        .descricao-perfil {
-            max-width: 750px;
-            margin: 0 auto;
-            line-height: 1.7;
-            color: #666;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Informações
-        |--------------------------------------------------------------------------
-        */
-
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-            margin-bottom: 25px;
-        }
-
-        .card h2 {
-            color: #00a86b;
-            margin-bottom: 25px;
-        }
-
-        .informacoes {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
-        }
-
-        .informacao {
-            background: #f8faf9;
-            padding: 18px;
-            border-radius: 10px;
-        }
-
-        .informacao span {
-            display: block;
-            color: #777;
-            font-size: 14px;
-            margin-bottom: 7px;
-        }
-
-        .informacao strong {
-            color: #333;
-            font-size: 16px;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Análise da IA
-        |--------------------------------------------------------------------------
-        */
-
-        .analise-ia {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-            margin-bottom: 25px;
-            border-left: 5px solid #00a86b;
-        }
-
-        .analise-ia h2 {
-            color: #00a86b;
-            margin-bottom: 10px;
-        }
-
-        .subtitulo-ia {
-            color: #777;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        .analise-conteudo {
-            color: #444;
-            line-height: 1.8;
-            font-size: 16px;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Aviso
-        |--------------------------------------------------------------------------
-        */
-
-        .aviso {
-            background: #f8f8f8;
-            border-radius: 10px;
-            padding: 18px;
-            color: #666;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-top: 20px;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Botões
-        |--------------------------------------------------------------------------
-        */
-
-        .botoes {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-top: 30px;
-        }
-
-        .botao {
-            display: inline-block;
-            padding: 13px 25px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .botao-principal {
-            background: #00a86b;
-            color: white;
-        }
-
-        .botao-principal:hover {
-            background: #008f5b;
-        }
-
-        .botao-secundario {
-            background: #e9efec;
-            color: #333;
-        }
-
-        .botao-secundario:hover {
-            background: #dce5e0;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Responsividade
-        |--------------------------------------------------------------------------
-        */
-
-        @media (max-width: 700px) {
-
-            .container {
-                width: 94%;
-                margin: 25px auto;
-            }
-
-            .resultado-principal,
-            .card,
-            .analise-ia {
-                padding: 22px;
-            }
-
-            .informacoes {
-                grid-template-columns: 1fr;
-            }
-
-            .perfil {
-                font-size: 22px;
-                padding: 13px 25px;
-            }
-
-        }
-
-    </style>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f4f7f6">
+    <title>Resultado do perfil | Investegra</title>
+    <link rel="stylesheet" href="css/perfil.css">
+    <link rel="stylesheet" href="css/nav-reveal.css">
 </head>
-
-
 <body>
+    <div class="layout">
+        <aside class="sidebar">
+            <a href="dashboard.php" class="logo-link" aria-label="Ir para o Dashboard">
+                <div class="logo">INVESTEGRA</div>
+            </a>
+            <nav aria-label="Navegação principal">
+                <?php $perfilNavAtivo = true; require BASE_PATH . "/app/views/partials/perfil_nav.php"; ?>
+                <a href="carteiras.php">Carteiras</a>
+                <a href="simulacao.php">Simulações</a>
+                <a href="analise_carteira.php">Análises</a>
+                <a href="recomendacoes.php">Recomendações</a>
+                <a href="historico.php">Histórico</a>
+                <a href="indicadores.php">Indicadores</a>
+                <a href="alertas.php">Alertas</a>
+            </nav>
+            <a href="logout.php" class="logout">Sair</a>
+        </aside>
 
-<div class="container">
+        <main class="profile-page">
+            <section class="profile-heading" aria-labelledby="page-title">
+                <p class="eyebrow">SEU RESULTADO</p>
+                <h1 id="page-title">Resultado do seu perfil</h1>
+                <p class="heading-copy">Olá, <?= $escape($nome) ?>. Confira o resultado do seu questionário de investidor.</p>
+            </section>
 
+            <section class="profile-card risk-card" aria-labelledby="risk-title">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">PERFIL DE RISCO</p>
+                        <h2 id="risk-title">Seu perfil de investidor</h2>
+                    </div>
+                    <span class="risk-score"><?= (int) $score ?><small> pontos</small></span>
+                </div>
+                <div class="risk-summary">
+                    <span class="risk-dot" aria-hidden="true"></span>
+                    <strong><?= $escape($perfil) ?></strong>
+                </div>
+                <p class="risk-description"><?= $escape($descricao_perfil) ?></p>
+            </section>
 
-    <!-- CABEÇALHO -->
+            <section class="profile-card details-card" aria-labelledby="details-title">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">QUESTIONÁRIO</p>
+                        <h2 id="details-title">Informações consideradas</h2>
+                    </div>
+                </div>
+                <dl class="details-grid">
+                    <div class="detail-item">
+                        <dt>Idade</dt>
+                        <dd><?= $idade !== "" && $idade !== null ? $escape($idade) . " anos" : "Não informada" ?></dd>
+                    </div>
+                    <div class="detail-item">
+                        <dt>Experiência</dt>
+                        <dd><?= $experienciaLabel !== "" ? $escape($experienciaLabel) : "Não informada" ?></dd>
+                    </div>
+                    <div class="detail-item">
+                        <dt>Renda mensal aproximada</dt>
+                        <dd><?= ($renda_formatada ?? "0,00") !== "0,00" ? "R$ " . $escape($renda_formatada) : "Não informada" ?></dd>
+                    </div>
+                    <div class="detail-item">
+                        <dt>Horizonte de investimento</dt>
+                        <dd><?= $horizonteLabel !== "" ? $escape($horizonteLabel) : "Não informado" ?></dd>
+                    </div>
+                    <div class="detail-item">
+                        <dt>Tolerância ao risco</dt>
+                        <dd><?= $toleranciaLabel !== "" ? $escape($toleranciaLabel) : "Não informada" ?></dd>
+                    </div>
+                    <div class="detail-item">
+                        <dt>Objetivo financeiro</dt>
+                        <dd><?= $objetivoLabel !== "" ? $escape($objetivoLabel) : "Não informado" ?></dd>
+                    </div>
+                    <?php if (trim((string) $descricao) !== ""): ?>
+                        <div class="detail-item detail-item-wide">
+                            <dt>Sobre você</dt>
+                            <dd><?= nl2br($escape($descricao)) ?></dd>
+                        </div>
+                    <?php endif; ?>
+                </dl>
+            </section>
 
-    <div class="cabecalho">
+            <section class="profile-card ai-analysis" aria-labelledby="analysis-title">
+                <h3 id="analysis-title">Análise complementar</h3>
+                <?php if (trim((string) $analise_ia) !== ""): ?>
+                    <p><?= nl2br($escape($analise_ia)) ?></p>
+                <?php else: ?>
+                    <p>A análise complementar ainda não está disponível. Seu perfil foi calculado e salvo normalmente.</p>
+                <?php endif; ?>
+                <p class="analysis-notice">
+                    Esta análise tem finalidade educacional. Não constitui recomendação de compra ou venda de ativos.
+                </p>
+            </section>
 
-        <h1>Resultado do seu perfil</h1>
+            <div class="result-actions">
+                <a class="result-button result-button-secondary" href="meu_perfil.php">Voltar ao meu perfil</a>
+                <a class="result-button" href="questionario_perfil.php">Refazer questionário</a>
+            </div>
 
-        <p>
-            Olá, <?= $nome ?>! Veja abaixo o resultado do seu questionário.
-        </p>
-
+            <footer class="page-footer">Investegra <span aria-hidden="true">&middot;</span> Seu futuro, bem investido.</footer>
+        </main>
     </div>
-
-
-    <!-- RESULTADO PRINCIPAL -->
-
-    <section class="resultado-principal">
-
-        <h2>Seu perfil de risco</h2>
-
-        <div class="perfil">
-            <?= $perfil ?>
-        </div>
-
-        <div class="score">
-
-            Pontuação:
-
-            <strong>
-                <?= $score ?>
-            </strong>
-
-            pontos
-
-        </div>
-
-        <p class="descricao-perfil">
-
-            <?= $descricao_perfil ?>
-
-        </p>
-
-    </section>
-
-
-    <!-- ANÁLISE DA IA -->
-
-    <?php if (!empty($analise_ia)): ?>
-
-        <section class="analise-ia">
-
-            <h2>🤖 Análise complementar</h2>
-
-            <p class="subtitulo-ia">
-
-                Uma análise educacional gerada pelo sistema com auxílio
-                de inteligência artificial.
-
-            </p>
-
-            <div class="analise-conteudo">
-
-                <?= nl2br(
-                    htmlspecialchars(
-                        $analise_ia,
-                        ENT_QUOTES,
-                        "UTF-8"
-                    )
-                ) ?>
-
-            </div>
-
-            <div class="aviso">
-
-                <strong>Importante:</strong>
-
-                Esta análise tem finalidade exclusivamente educacional.
-                Ela não substitui uma análise financeira profissional,
-                não constitui recomendação de compra ou venda e não
-                garante resultados futuros.
-
-            </div>
-
-        </section>
-
-    <?php else: ?>
-
-        <section class="analise-ia">
-
-            <h2>🤖 Análise complementar</h2>
-
-            <p class="subtitulo-ia">
-
-                A análise por inteligência artificial ainda não está
-                disponível.
-
-            </p>
-
-            <div class="aviso">
-
-                Seu perfil tradicional foi calculado e salvo normalmente.
-                A análise complementar da IA poderá aparecer quando o
-                serviço Python/Ollama estiver disponível.
-
-            </div>
-
-        </section>
-
-    <?php endif; ?>
-
-
-    <!-- INFORMAÇÕES UTILIZADAS -->
-
-    <section class="card">
-
-        <h2>Informações do perfil</h2>
-
-        <div class="informacoes">
-
-
-            <div class="informacao">
-
-                <span>Idade</span>
-
-                <strong>
-                    <?= $idade ?> anos
-                </strong>
-
-            </div>
-
-
-            <div class="informacao">
-
-                <span>Experiência</span>
-
-                <strong>
-                    <?= $experiencia ?>
-                </strong>
-
-            </div>
-
-
-            <div class="informacao">
-
-                <span>Renda mensal aproximada</span>
-
-                <strong>
-                    R$ <?= $renda_formatada ?>
-                </strong>
-
-            </div>
-
-
-            <div class="informacao">
-
-                <span>Horizonte de investimento</span>
-
-                <strong>
-                    <?= $horizonte ?>
-                </strong>
-
-            </div>
-
-
-            <div class="informacao">
-
-                <span>Tolerância ao risco</span>
-
-                <strong>
-                    <?= $tolerancia ?>
-                </strong>
-
-            </div>
-
-
-            <div class="informacao">
-
-                <span>Objetivo</span>
-
-                <strong>
-                    <?= $objetivo ?>
-                </strong>
-
-            </div>
-
-
-        </div>
-
-
-        <?php if (!empty($descricao)): ?>
-
-            <div class="informacao" style="margin-top: 18px;">
-
-                <span>Sobre você</span>
-
-                <strong>
-                    <?= $descricao ?>
-                </strong>
-
-            </div>
-
-        <?php endif; ?>
-
-
-    </section>
-
-
-    <!-- BOTÕES -->
-
-    <div class="botoes">
-
-        <a
-            href="questionario_perfil.php"
-            class="botao botao-secundario"
-        >
-            Refazer questionário
-        </a>
-
-
-        <a
-            href="dashboard.php"
-            class="botao botao-principal"
-        >
-            Ir para o dashboard
-        </a>
-
-    </div>
-
-
-</div>
-
 </body>
-
 </html>

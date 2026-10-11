@@ -85,6 +85,37 @@
     font-weight: 700;
 }
 
+.sidebar nav a.perfil-nav .quiz-tooltip {
+    position: absolute;
+    top: 50%;
+    right: 50px;
+    z-index: 1001;
+    width: max-content;
+    max-width: min(220px, calc(100vw - 100px));
+    padding: 10px 13px;
+    transform: translateY(-50%);
+    border-radius: 9px;
+    background: #1f2933;
+    box-shadow: 0 5px 16px rgba(31, 41, 51, 0.18);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-align: center;
+    white-space: normal;
+}
+
+.sidebar nav a.perfil-nav .quiz-tooltip::after {
+    position: absolute;
+    top: 50%;
+    right: -6px;
+    width: 12px;
+    height: 12px;
+    transform: translateY(-50%) rotate(45deg);
+    background: #1f2933;
+    content: "";
+}
+
 .sidebar nav a.perfil-nav::before {
     content: "P";
     font-size: 16px;

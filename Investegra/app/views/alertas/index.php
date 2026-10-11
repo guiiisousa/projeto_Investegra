@@ -29,7 +29,7 @@
     </a>
 
     <nav>
-        <a href="resultado_quiz.php" class="perfil-nav" aria-label="Perfil">Perfil</a>
+        <?php require BASE_PATH . "/app/views/partials/perfil_nav.php"; ?>
         <a href="carteiras.php">Carteiras</a>
         <a href="simulacao.php">Simulações</a>
         <a href="analises.php">Análises</a>
@@ -52,11 +52,6 @@
                 Informações importantes sobre sua carteira
             </p>
         </div>
-
-        <a href="dashboard.php"
-           class="voltar">
-            Voltar ao dashboard
-        </a>
 
     </header>
 

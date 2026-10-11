@@ -9,7 +9,7 @@ class Usuario extends Model
     public static function findByEmail(string $email): ?array
     {
         return self::fetchOne(
-            "SELECT id, nome, email, senha, perfil_risco
+            "SELECT id, nome, email, senha, perfil_risco, score_risco
              FROM usuarios
              WHERE email = ?",
             "s",

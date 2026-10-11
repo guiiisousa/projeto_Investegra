@@ -37,7 +37,7 @@
     </a>
 
     <nav>
-        <a href="resultado_quiz.php" class="perfil-nav" aria-label="Perfil">Perfil</a>
+        <?php require BASE_PATH . "/app/views/partials/perfil_nav.php"; ?>
         <a href="carteiras.php" class="ativo">Carteiras</a>
         <a href="simulacao.php">Simulações</a>
         <a href="analise_carteira.php">Análises</a>
@@ -73,12 +73,14 @@
         </div>
 
 
-        <a
-            href="nova_carteira.php"
-            class="btn-principal"
-        >
-            + Nova carteira
-        </a>
+        <?php if (!empty($carteiras)): ?>
+            <a
+                href="nova_carteira.php"
+                class="btn-principal"
+            >
+                + Nova carteira
+            </a>
+        <?php endif; ?>
 
     </div>
 

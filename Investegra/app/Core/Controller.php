@@ -2,11 +2,24 @@
 
 namespace App\Core;
 
+use App\Models\Usuario;
+
 abstract class Controller
 {
     public function __construct()
     {
         Session::start();
+
+        if (Session::check() && !Session::hasQuizStatus()) {
+            $usuarioId = Session::userId();
+
+            if ($usuarioId !== null) {
+                $usuario = Usuario::perfil($usuarioId);
+                Session::setQuizConcluido(
+                    $usuario !== null && $usuario["score_risco"] !== null
+                );
+            }
+        }
     }
 
     protected function view(string $view, array $dados = []): void
@@ -32,7 +45,13 @@ abstract class Controller
             $this->redirect("login.php");
         }
 
-        return Session::userId();
+        $usuarioId = Session::userId();
+
+        if ($usuarioId === null) {
+            $this->redirect("login.php");
+        }
+
+        return $usuarioId;
     }
 
     /* Respostas JSON (endpoints /api). */

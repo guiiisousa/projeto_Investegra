@@ -20,6 +20,10 @@
         rel="stylesheet"
         href="css/nav-reveal.css"
     >
+    <link
+        rel="stylesheet"
+        href="css/editar-carteira.css?v=1"
+    >
 
 </head>
 
@@ -39,9 +43,7 @@
 
         <nav>
 
-            <a href="resultado_quiz.php" class="perfil-nav" aria-label="Perfil">
-                Perfil
-            </a>
+            <?php require BASE_PATH . "/app/views/partials/perfil_nav.php"; ?>
 
             <a
                 href="carteiras.php"

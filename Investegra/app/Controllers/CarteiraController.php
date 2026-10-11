@@ -20,7 +20,22 @@ class CarteiraController extends Controller
     {
         $this->requireLogin();
 
-        $this->view("carteiras/create");
+        $tokens = $_SESSION["carteira_create_tokens"] ?? [];
+        $agora = time();
+        $tokens = array_filter(
+            $tokens,
+            static fn ($criadoEm) => $agora - $criadoEm < 1800
+        );
+
+        $token = bin2hex(random_bytes(32));
+        $tokens[$token] = $agora;
+        $_SESSION["carteira_create_tokens"] = $tokens;
+
+        $erro = ($_GET["erro"] ?? "") === "envio"
+            ? "Este formulário já foi enviado. Confira suas carteiras antes de tentar novamente."
+            : "";
+
+        $this->view("carteiras/create", compact("token", "erro"));
     }
 
     public function store()
@@ -30,6 +45,19 @@ class CarteiraController extends Controller
         if (!$this->isPost()) {
             $this->redirect("carteiras.php");
         }
+
+        $token = $_POST["token"] ?? "";
+        $tokens = $_SESSION["carteira_create_tokens"] ?? [];
+
+        if (
+            !\is_string($token)
+            || !isset($tokens[$token])
+        ) {
+            $this->redirect("nova_carteira.php?erro=envio");
+        }
+
+        unset($tokens[$token]);
+        $_SESSION["carteira_create_tokens"] = $tokens;
 
         $nome = trim($_POST["nome"] ?? "");
         $descricao = trim($_POST["descricao"] ?? "");

@@ -55,6 +55,8 @@ $router->add("recomendacoes", "RecomendacaoController", "index");
 $router->add("questionario_perfil", "PerfilController", "questionario");
 $router->add("processar_questionario", "PerfilController", "processar");
 $router->add("resultado_quiz", "PerfilController", "resultado");
+$router->add("resultado", "PerfilController", "resultado");
+$router->add("meu_perfil", "PerfilController", "perfil");
 
 /* API (JSON) */
 $router->add("api/chat", "ApiController", "chat");

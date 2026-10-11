@@ -178,36 +178,6 @@
         }
 
 
-        .botao-voltar {
-
-            display: inline-block;
-
-            margin-top: 5px;
-
-            padding: 11px 18px;
-
-            background: #00a86b;
-
-            color: white;
-
-            text-decoration: none;
-
-            border-radius: 7px;
-
-            font-weight: bold;
-
-            transition: 0.2s;
-
-        }
-
-
-        .botao-voltar:hover {
-
-            background: #008f5b;
-
-        }
-
-
         @media (max-width: 1000px) {
 
             .cards-historico {
@@ -262,9 +232,7 @@
 
         <nav>
 
-            <a href="resultado_quiz.php" class="perfil-nav" aria-label="Perfil">
-                Perfil
-            </a>
+            <?php require BASE_PATH . "/app/views/partials/perfil_nav.php"; ?>
             <a href="carteiras.php">
                 Carteiras
             </a>
@@ -825,16 +793,6 @@
 
 
         </section>
-
-
-        <a
-            href="dashboard.php"
-            class="botao-voltar"
-        >
-            Voltar ao Dashboard
-        </a>
-
-
     </main>
 
 </div>

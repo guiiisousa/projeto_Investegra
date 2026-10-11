@@ -20,11 +20,15 @@
         rel="stylesheet"
         href="css/nav-reveal.css"
     >
+    <link
+        rel="stylesheet"
+        href="css/editar-carteira.css?v=1"
+    >
 </head>
 
 <body>
 
-<div class="body">
+<div class="layout">
 
 
     <aside class="sidebar">
@@ -38,9 +42,7 @@
 
         <nav>
 
-            <a href="resultado_quiz.php" class="perfil-nav" aria-label="Perfil">
-                Perfil
-            </a>
+            <?php require BASE_PATH . "/app/views/partials/perfil_nav.php"; ?>
 
             <a
                 href="carteiras.php"
@@ -96,12 +98,21 @@
                 Crie uma carteira para organizar seus investimentos.
             </p>
 
+            <?php if (!empty($erro)): ?>
+                <p class="mensagem-erro" role="alert"><?= htmlspecialchars($erro, ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") ?></p>
+            <?php endif; ?>
 
             <form
                 action="processando_carteira.php"
                 method="POST"
+                onsubmit="const button = this.querySelector('button[type=submit]'); if (button.disabled) return false; button.disabled = true; button.textContent = 'Criando...';"
             >
 
+                <input
+                    type="hidden"
+                    name="token"
+                    value="<?= htmlspecialchars($token, ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8") ?>"
+                >
 
                 <label for="nome">
                     Nome da carteira

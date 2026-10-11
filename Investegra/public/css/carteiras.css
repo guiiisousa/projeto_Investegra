@@ -2,6 +2,127 @@
    INVESTEGRA - CARTEIRAS
    ========================================================= */
 
+/* =========================================================
+   FORMULARIO DE CRIACAO E EDICAO
+   ========================================================= */
+
+.conteudo {
+    width: 100%;
+    min-width: 0;
+    padding: 35px;
+}
+
+.formulario-container {
+    width: min(100%, 700px);
+    margin: 0 auto;
+    padding: 32px;
+    border: 1px solid #e6ece9;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 18px rgba(25, 45, 37, 0.055);
+}
+
+.formulario-container h1 {
+    margin: 0 0 8px;
+    color: #17211d;
+    font-size: 30px;
+    line-height: 1.2;
+}
+
+.formulario-container .subtitulo {
+    margin: 0 0 28px;
+    color: #6b7772;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.formulario-container form label {
+    display: block;
+    margin: 0 0 8px;
+    color: #27332e;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.formulario-container form input:not([type="hidden"]),
+.formulario-container form textarea {
+    display: block;
+    width: 100%;
+    margin: 0 0 20px;
+    padding: 12px 14px;
+    border: 1px solid #d5ded9;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #1f2933;
+    font: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.formulario-container form input:not([type="hidden"]) {
+    min-height: 46px;
+}
+
+.formulario-container form textarea {
+    min-height: 130px;
+    resize: vertical;
+}
+
+.formulario-container form input:focus,
+.formulario-container form textarea:focus {
+    outline: none;
+    border-color: #00a86b;
+    box-shadow: 0 0 0 3px rgba(0, 168, 107, 0.12);
+}
+
+.botoes-formulario {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.botoes-formulario .botao,
+.botoes-formulario .botao-secundario {
+    display: inline-flex;
+    min-height: 43px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 18px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.botoes-formulario .botao {
+    background: #00a86b;
+    color: #ffffff;
+}
+
+.botoes-formulario .botao:hover {
+    transform: translateY(-1px);
+    border-color: #008f5a;
+    background: #008f5a;
+}
+
+.botoes-formulario .botao-secundario {
+    border-color: #dce3df;
+    background: #f7f9f8;
+    color: #4e5b55;
+}
+
+.botoes-formulario .botao-secundario:hover {
+    border-color: #c7d5ce;
+    background: #edf2ef;
+}
+
 
 /* =========================================================
    RESET
@@ -808,6 +929,28 @@ a {
         width: 92%;
 
         padding-top: 25px;
+    }
+
+    .conteudo {
+        padding: 22px 16px;
+    }
+
+    .formulario-container {
+        padding: 24px 20px;
+        border-radius: 13px;
+    }
+
+    .formulario-container h1 {
+        font-size: 26px;
+    }
+
+    .botoes-formulario {
+        flex-direction: column-reverse;
+    }
+
+    .botoes-formulario .botao,
+    .botoes-formulario .botao-secundario {
+        width: 100%;
     }
 
 

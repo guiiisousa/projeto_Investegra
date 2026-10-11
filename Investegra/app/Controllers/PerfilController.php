@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Core\Session;
 use App\Models\Usuario;
 use App\Services\AnaliseIAService;
 use App\Services\PerfilService;
@@ -29,6 +30,8 @@ class PerfilController extends Controller
         if (!Usuario::salvarPerfil($usuarioId, $dados)) {
             $this->abort("Erro ao salvar o perfil.");
         }
+
+        Session::setQuizConcluido(true);
 
         /* A análise da IA é opcional: se falhar, o perfil já está salvo. */
         $analise = AnaliseIAService::analisarPerfil([
@@ -59,18 +62,17 @@ class PerfilController extends Controller
             $this->abort("Usuário não encontrado.");
         }
 
-        $esc = function ($valor) {
-            return htmlspecialchars($valor ?? "");
-        };
-
-        $nome = $esc($usuario["nome"]);
-        $idade = $esc($usuario["idade"]);
-        $experiencia = $esc($usuario["experiencia"]);
-        $horizonte = $esc($usuario["horizonte_investimento"]);
-        $tolerancia = $esc($usuario["tolerancia_risco"]);
-        $objetivo = $esc($usuario["objetivo"]);
-        $descricao = $esc($usuario["descricao_pessoal"]);
-        $perfil = htmlspecialchars($usuario["perfil_risco"] ?? "Moderado");
+        $nome = $usuario["nome"] ?? "";
+        $idade = $usuario["idade"] ?? "";
+        $experiencia = $usuario["experiencia"] ?? "";
+        $horizonte = $usuario["horizonte_investimento"] ?? "";
+        $tolerancia = $usuario["tolerancia_risco"] ?? "";
+        $objetivo = $usuario["objetivo"] ?? "";
+        $descricao = $usuario["descricao_pessoal"] ?? "";
+        $perfil = $usuario["perfil_risco"] ?? "Moderado";
+        if (($usuario["score_risco"] ?? null) === null) {
+            $perfil = "Não definido";
+        }
 
         $score = (int) ($usuario["score_risco"] ?? 0);
         $analise_ia = $usuario["analise_ia"] ?? "";
@@ -82,6 +84,44 @@ class PerfilController extends Controller
         $this->view("perfil/resultado", compact(
             "nome", "idade", "experiencia", "renda_formatada", "horizonte",
             "tolerancia", "objetivo", "descricao", "score", "perfil",
+            "analise_ia", "descricao_perfil"
+        ));
+    }
+
+    public function perfil()
+    {
+        $usuarioId = $this->requireLogin();
+
+        $usuario = Usuario::perfil($usuarioId);
+
+        if (!$usuario) {
+            $this->abort("Usuário não encontrado.");
+        }
+
+        $quizConcluido = ($usuario["score_risco"] ?? null) !== null;
+        Session::setQuizConcluido($quizConcluido);
+
+        $nome = $usuario["nome"] ?? "";
+        $idade = $usuario["idade"] ?? "";
+        $experiencia = $usuario["experiencia"] ?? "";
+        $horizonte = $usuario["horizonte_investimento"] ?? "";
+        $tolerancia = $usuario["tolerancia_risco"] ?? "";
+        $objetivo = $usuario["objetivo"] ?? "";
+        $descricao = $usuario["descricao_pessoal"] ?? "";
+        $perfil = $usuario["perfil_risco"] ?? "Moderado";
+        if (($usuario["score_risco"] ?? null) === null) {
+            $perfil = "Não definido";
+        }
+
+        $score = (int) ($usuario["score_risco"] ?? 0);
+        $analise_ia = $usuario["analise_ia"] ?? "";
+
+        $renda_formatada = number_format((float) ($usuario["renda_mensal"] ?? 0), 2, ",", ".");
+        $descricao_perfil = PerfilService::descricao($perfil);
+
+        $this->view("perfil/perfil", compact(
+            "nome", "idade", "experiencia", "renda_formatada", "horizonte",
+            "tolerancia", "objetivo", "descricao", "score", "perfil", "quizConcluido",
             "analise_ia", "descricao_perfil"
         ));
     }

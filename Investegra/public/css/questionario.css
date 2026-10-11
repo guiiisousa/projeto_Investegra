@@ -123,6 +123,9 @@ body {
 }
 
 .botao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border: none;
     border-radius: 10px;
     padding: 13px 25px;
@@ -131,6 +134,7 @@ body {
     font-weight: bold;
     cursor: pointer;
     font-size: 15px;
+    text-decoration: none;
 }
 
 .botao:hover {
