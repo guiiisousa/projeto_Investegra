@@ -1,0 +1,4 @@
+.env
+vendor/
+dados/**/*.csv
+__pycache__/

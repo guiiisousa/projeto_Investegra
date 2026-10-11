@@ -210,3 +210,13 @@
             transform:translateY(0);
         }
     }
+
+.mensagem{
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+}
+.mensagem.erro{ background:#fdecea; color:#b3261e; }
+.mensagem.sucesso{ background:#e6f4ea; color:#1e7a3c; }

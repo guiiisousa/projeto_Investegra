@@ -1,0 +1,483 @@
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7f6;
+    color: #222;
+}
+
+
+/* =========================================================
+   LAYOUT
+========================================================= */
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #e5e5e5;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+
+.logo {
+    padding: 28px 25px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #00a86b;
+    letter-spacing: 1px;
+}
+
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 15px;
+}
+
+
+.sidebar nav a {
+    text-decoration: none;
+    color: #555;
+    padding: 13px 15px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+
+.sidebar nav a:hover {
+    background: #edf8f4;
+    color: #00a86b;
+}
+
+
+.sidebar nav a.ativo {
+    background: #00a86b;
+    color: white;
+}
+
+
+/* =========================================================
+   CONTEÚDO
+========================================================= */
+
+.conteudo {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+    padding: 40px;
+}
+
+
+.cabecalho {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+
+.cabecalho h1 {
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+
+
+.cabecalho p {
+    color: #777;
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   BOTÃO
+========================================================= */
+
+.btn-nova {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 18px;
+    background: #00a86b;
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+
+.btn-nova:hover {
+    background: #008f5b;
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   RESUMO
+========================================================= */
+
+.resumo-grid {
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns:
+        repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+
+.resumo-card {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 15px;
+    padding: 22px;
+    box-shadow:
+        0 6px 20px
+        rgba(0, 0, 0, 0.04);
+}
+
+
+.resumo-card span {
+    display: block;
+    color: #777;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+
+.resumo-card strong {
+    display: block;
+    color: #00a86b;
+    font-size: 21px;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.card-grafico,
+.card-historico {
+    max-width: 1200px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow:
+        0 8px 25px
+        rgba(0, 0, 0, 0.05);
+}
+
+
+.card-historico {
+    margin-top: 25px;
+}
+
+
+.card-titulo {
+    margin-bottom: 25px;
+}
+
+
+.card-titulo h2 {
+    font-size: 21px;
+    margin-bottom: 7px;
+}
+
+
+.card-titulo p {
+    color: #777;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   GRÁFICO DE BARRAS
+========================================================= */
+
+.grafico-barras {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+
+.barra-item {
+    width: 100%;
+}
+
+
+.barra-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 8px;
+}
+
+
+.barra-info > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+
+.barra-info strong {
+    color: #333;
+    font-size: 13px;
+}
+
+
+.barra-info span {
+    color: #888;
+    font-size: 11px;
+}
+
+
+.barra-info > strong {
+    color: #00a86b;
+    white-space: nowrap;
+}
+
+
+.barra-fundo {
+    width: 100%;
+    height: 12px;
+    background: #edf1ef;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+
+.barra-valor {
+    height: 100%;
+    min-width: 2%;
+    background: #00a86b;
+    border-radius: 20px;
+    transition: width 0.5s ease;
+}
+
+
+/* =========================================================
+   TABELA
+========================================================= */
+
+.tabela-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+
+thead {
+    background: #f7f9f8;
+}
+
+
+th {
+    padding: 14px 12px;
+    text-align: left;
+    color: #666;
+    font-size: 12px;
+    font-weight: bold;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+
+td {
+    padding: 15px 12px;
+    color: #555;
+    font-size: 13px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+
+tbody tr:hover {
+    background: #fafcfb;
+}
+
+
+td.montante {
+    color: #00a86b;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+
+.badge-compostos {
+    background: #e7f8f0;
+    color: #008f5b;
+}
+
+
+.badge-simples {
+    background: #f1f1f1;
+    color: #666;
+}
+
+
+/* =========================================================
+   ESTADO VAZIO
+========================================================= */
+
+.estado-vazio {
+    max-width: 700px;
+    margin: 70px auto;
+    text-align: center;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 18px;
+    padding: 50px 30px;
+    box-shadow:
+        0 8px 25px
+        rgba(0, 0, 0, 0.05);
+}
+
+
+.estado-icone {
+    font-size: 45px;
+    margin-bottom: 20px;
+}
+
+
+.estado-vazio h2 {
+    margin-bottom: 10px;
+}
+
+
+.estado-vazio p {
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+
+/* =========================================================
+   RESPONSIVIDADE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .resumo-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .sidebar {
+        width: 190px;
+    }
+
+
+    .conteudo {
+        margin-left: 190px;
+        width: calc(100% - 190px);
+        padding: 25px;
+    }
+
+
+    .cabecalho {
+        flex-direction: column;
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .layout {
+        display: block;
+    }
+
+
+    .sidebar {
+        position: static;
+        width: 100%;
+        min-height: auto;
+    }
+
+
+    .sidebar nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+
+    .sidebar nav a {
+        font-size: 12px;
+    }
+
+
+    .conteudo {
+        margin-left: 0;
+        width: 100%;
+        padding: 20px;
+    }
+
+
+    .resumo-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .cabecalho h1 {
+        font-size: 24px;
+    }
+
+
+    .card-grafico,
+    .card-historico {
+        padding: 20px;
+    }
+
+}

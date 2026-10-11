@@ -2,75 +2,83 @@
 
 namespace App\Models;
 
-class Usuario
+use App\Core\Model;
+
+class Usuario extends Model
 {
-    private $conn;
-
-    public function __construct($conn)
+    public static function findByEmail(string $email): ?array
     {
-        $this->conn = $conn;
-    }
-
-    public function getNameByEmail($email)
-    {
-        $sql = "
-            SELECT nome
-            FROM usuarios
-            WHERE email = ?
-        ";
-
-        $stmt = $this->conn->prepare($sql);
-
-        $stmt->bind_param(
+        return self::fetchOne(
+            "SELECT id, nome, email, senha, perfil_risco
+             FROM usuarios
+             WHERE email = ?",
             "s",
-            $email
+            [$email]
         );
-
-        $stmt->execute();
-
-        return $stmt
-            ->get_result()
-            ->fetch_assoc();
     }
 
-     public function criar($nome, $email, $senha)
+    public static function emailExists(string $email): bool
     {
-        $sql = "
-            INSERT INTO usuarios
-            (nome, email, senha)
-            VALUES (?, ?, ?)
-        ";
+        return self::fetchOne(
+            "SELECT id FROM usuarios WHERE email = ?",
+            "s",
+            [$email]
+        ) !== null;
+    }
 
-        $stmt = $this->conn->prepare($sql);
-
-        $stmt->bind_param(
-            "sss",
-            $nome,
-            $email,
-            $senha
+    public static function create(
+        string $nome,
+        string $email,
+        string $documento,
+        string $senhaHash,
+        string $tipo
+    ): bool {
+        return self::execute(
+            "INSERT INTO usuarios (nome, email, documento, senha, tipo_usuario)
+             VALUES (?, ?, ?, ?, ?)",
+            "sssss",
+            [$nome, $email, $documento, $senhaHash, $tipo]
         );
-
-        return $stmt->execute();
-    }
-    public function getConnection()
-    {
-        return $this->conn;
     }
 
-    public function getUsuarioByEmail($email)
+    /* Perfil de investidor completo (sem a senha). */
+    public static function perfil(int $id): ?array
     {
-         $sql = "
-            SELECT *
-            FROM usuarios
-            WHERE email = ?
-        ";
+        return self::fetchOne(
+            "SELECT nome, idade, experiencia, renda_mensal,
+                    horizonte_investimento, tolerancia_risco, objetivo,
+                    descricao_pessoal, score_risco, perfil_risco, analise_ia
+             FROM usuarios
+             WHERE id = ?",
+            "i",
+            [$id]
+        );
+    }
 
-        $stmt = $this->conn->prepare($sql);
+    public static function salvarPerfil(int $id, array $d): bool
+    {
+        return self::execute(
+            "UPDATE usuarios
+             SET idade = ?, experiencia = ?, renda_mensal = ?,
+                 horizonte_investimento = ?, tolerancia_risco = ?,
+                 objetivo = ?, descricao_pessoal = ?,
+                 score_risco = ?, perfil_risco = ?
+             WHERE id = ?",
+            "isdssssisi",
+            [
+                $d["idade"], $d["experiencia"], $d["renda_mensal"],
+                $d["horizonte"], $d["tolerancia"], $d["objetivo"],
+                $d["descricao"], $d["score"], $d["perfil"], $id,
+            ]
+        );
+    }
 
-        $stmt->bind_param("s", $email);
-
-        $stmt->execute();
-
-        return $stmt->get_result()->fetch_assoc();
+    public static function salvarAnaliseIA(int $id, string $analise): bool
+    {
+        return self::execute(
+            "UPDATE usuarios SET analise_ia = ? WHERE id = ?",
+            "si",
+            [$analise, $id]
+        );
     }
 }

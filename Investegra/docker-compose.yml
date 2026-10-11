@@ -1,44 +1,57 @@
-version: "3.9"
-
 services:
-
   app:
     build:
       context: .
       dockerfile: docker/php/Dockerfile
     container_name: investegra_app
-    restart: always
+    restart: unless-stopped
     ports:
       - "8080:80"
     volumes:
-      - ./:/var/www/html/
+      - ./:/var/www/html
+    environment:
+      DB_HOST: mysql
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+      # Ollama roda na sua máquina (fora do container)
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434/api/generate}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
   mysql:
     image: mysql:8.0
     container_name: investegra_mysql
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # Só roda na primeira criação do volume
+      - ./database/Investegra.sql:/docker-entrypoint-initdb.d/01-Investegra.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: investegra_phpmyadmin
-    restart: always
+    restart: unless-stopped
     depends_on:
       - mysql
     ports:
-      - "8081:80"
+      - "127.0.0.1:8081:80"
     environment:
       PMA_HOST: mysql
       PMA_PORT: 3306
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
 
 volumes:
   mysql_data:
