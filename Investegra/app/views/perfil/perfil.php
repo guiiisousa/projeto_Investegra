@@ -47,7 +47,7 @@ $valorOuPadrao = static function ($value) use ($escape): string {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f5f7f4">
     <title>Meu perfil | Investegra</title>
-    <link rel="stylesheet" href="css/perfil.css?v=5">
+    <link rel="stylesheet" href="css/perfil.css?v=6">
     <link rel="stylesheet" href="css/nav-reveal.css?v=2">
 </head>
 <body>
@@ -163,6 +163,28 @@ $valorOuPadrao = static function ($value) use ($escape): string {
                     <p><?= nl2br($escape($analise_ia)) ?></p>
                 </div>
             <?php endif; ?>
+        </section>
+
+        <section class="profile-card theme-card" aria-labelledby="theme-title">
+            <div class="theme-copy">
+                <p class="eyebrow">APARÊNCIA</p>
+                <h2 id="theme-title">Tema da interface</h2>
+                <p>Escolha como o Investegra será exibido.</p>
+            </div>
+            <div class="theme-options" role="group" aria-label="Tema da interface">
+                <button type="button" class="theme-option" data-theme-option="light">
+                    <span class="theme-preview theme-preview-light" aria-hidden="true">
+                        <span></span><span></span><span></span>
+                    </span>
+                    <strong>Claro</strong>
+                </button>
+                <button type="button" class="theme-option" data-theme-option="dark">
+                    <span class="theme-preview theme-preview-dark" aria-hidden="true">
+                        <span></span><span></span><span></span>
+                    </span>
+                    <strong>Escuro</strong>
+                </button>
+            </div>
         </section>
 
         <section class="logout-card" aria-labelledby="logout-title">

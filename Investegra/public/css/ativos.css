@@ -895,8 +895,112 @@ textarea:focus {
 
 .acoes-ativo {
     display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
     gap: 10px;
     margin-top: 20px;
+}
+
+.movimentacao-ativo {
+    position: relative;
+}
+
+.movimentacao-ativo summary {
+    list-style: none;
+}
+
+.movimentacao-ativo summary::-webkit-details-marker {
+    display: none;
+}
+
+.btn-comprar,
+.btn-vender {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-comprar {
+    border: 1px solid #d5eee2;
+    background: #e9f7f1;
+    color: #008f5a;
+}
+
+.btn-vender {
+    border: 1px solid #ffe0e0;
+    background: #fff0f0;
+    color: #d64545;
+}
+
+.form-movimentacao {
+    width: 280px;
+    margin-top: 10px;
+    padding: 14px;
+    border: 1px solid #e6ece9;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 8px 25px rgba(25, 45, 37, 0.12);
+}
+
+.form-movimentacao label {
+    display: grid;
+    gap: 6px;
+    margin: 0 0 10px;
+    color: #75807c;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.form-movimentacao input {
+    width: 100%;
+    min-height: 40px;
+    margin: 0;
+    padding: 8px 10px;
+    border: 1px solid #d5ded9;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #303a36;
+    font-size: 14px;
+}
+
+.form-movimentacao input:focus {
+    outline: none;
+    border-color: #00a86b;
+    box-shadow: 0 0 0 3px rgba(0, 168, 107, 0.12);
+}
+
+.saldo-disponivel {
+    margin: 4px 0 10px;
+    color: #75807c;
+    font-size: 12px;
+}
+
+.btn-confirmar-compra,
+.btn-confirmar-venda {
+    width: 100%;
+    min-height: 40px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-confirmar-compra {
+    border: 1px solid #00a86b;
+    background: #00a86b;
+    color: #ffffff;
+}
+
+.btn-confirmar-venda {
+    border: 1px solid #d64545;
+    background: #d64545;
+    color: #ffffff;
 }
 
 .btn-editar,
@@ -954,6 +1058,61 @@ textarea:focus {
 .estado-vazio p {
     color: #777;
     margin-bottom: 20px;
+}
+
+.graficos-carteira {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin: 22px 0 8px;
+}
+
+.painel-grafico-carteira {
+    min-width: 0;
+    padding: 22px;
+    border: 1px solid #e6ece9;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 18px rgba(25, 45, 37, 0.055);
+}
+
+.titulo-grafico-carteira {
+    margin-bottom: 16px;
+}
+
+.titulo-grafico-carteira h2 {
+    margin: 0 0 5px;
+    color: #27332e;
+    font-size: 17px;
+}
+
+.titulo-grafico-carteira p {
+    margin: 0;
+    color: #75807c;
+    font-size: 13px;
+}
+
+.grafico-carteira-container {
+    position: relative;
+    width: 100%;
+    height: 260px;
+}
+
+.grafico-categoria-carteira {
+    max-width: 520px;
+    height: 280px;
+    margin: 0 auto;
+}
+
+.grafico-carteira-vazio {
+    min-height: 260px;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    border-radius: 10px;
+    background: #f7f9f8;
+    color: #75807c;
+    text-align: center;
 }
 
 .secao-historico-carteira {
@@ -1102,6 +1261,10 @@ textarea:focus {
 
     .informacoes-ativo {
         grid-template-columns: repeat(3, 1fr);
+    }
+
+    .graficos-carteira {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -1439,5 +1602,17 @@ body {
     .acoes-topo a {
         width: 100%;
         flex: 1;
+    }
+
+    .acoes-ativo {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .movimentacao-ativo,
+    .btn-comprar,
+    .btn-vender,
+    .form-movimentacao {
+        width: 100%;
     }
 }

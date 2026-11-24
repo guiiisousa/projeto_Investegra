@@ -74,11 +74,6 @@
                 Recomendações
             </a>
 
-            <a href="historico_simulacoes.php">
-                Histórico
-            </a>
-
-
             <a href="alertas.php">
                 Alertas
             </a>
@@ -1076,11 +1071,6 @@
              ASSISTENTE
         ================================================== -->
 
-        <?php
-
-        include BASE_PATH . '/app/Views/partials/assistente_ia.php';
-
-        ?>
 
 
     </main>

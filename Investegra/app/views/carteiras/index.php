@@ -549,10 +549,17 @@
                                             "data_compra" => "Data da compra",
                                             "observacao" => "Observação",
                                         ];
+                                        $acaoExibida = $atividade["entidade"] === "Ativo"
+                                            ? ($atividade["acao"] === "criou"
+                                                ? "Compra"
+                                                : ($atividade["acao"] === "excluiu"
+                                                    ? "Venda"
+                                                    : ucfirst($atividade["acao"])))
+                                            : ucfirst($atividade["acao"]);
                                     ?>
                                     <article class="item-historico-carteira">
                                         <span class="tipo-historico-carteira">
-                                            <?= htmlspecialchars(ucfirst($atividade["acao"])) ?>
+                                            <?= htmlspecialchars($acaoExibida) ?>
                                         </span>
                                         <div class="conteudo-historico-carteira">
                                             <strong><?= htmlspecialchars($atividade["descricao"]) ?></strong>

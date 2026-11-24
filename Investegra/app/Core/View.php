@@ -6,7 +6,7 @@ class View
 {
     public static function render(string $view, array $dados = []): void
     {
-        $arquivo = BASE_PATH . '/app/Views/' . $view . '.php';
+        $arquivo = BASE_PATH . '/app/views/' . $view . '.php';
 
         if (!is_file($arquivo)) {
             http_response_code(500);

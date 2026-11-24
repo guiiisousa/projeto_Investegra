@@ -16,7 +16,7 @@
 
     <link
         rel="stylesheet"
-        href="css/ativos.css?v=3"
+        href="css/ativos.css?v=5"
     >
     <link
         rel="stylesheet"
@@ -215,6 +215,51 @@
         </div>
 
     </div>
+
+
+    <!-- =========================================================
+         GRÁFICOS DA CARTEIRA
+         ========================================================= -->
+
+    <section class="graficos-carteira">
+        <article class="painel-grafico-carteira">
+            <div class="titulo-grafico-carteira">
+                <div>
+                    <h2>Evolução da carteira</h2>
+                    <p>Variação do patrimônio registrada pelas alterações</p>
+                </div>
+            </div>
+
+            <?php if (empty($labelsEvolucaoCarteira)): ?>
+                <p class="grafico-carteira-vazio">
+                    Não há registros suficientes para mostrar a evolução.
+                </p>
+            <?php else: ?>
+                <div class="grafico-carteira-container">
+                    <canvas id="graficoEvolucaoCarteira"></canvas>
+                </div>
+            <?php endif; ?>
+        </article>
+
+        <article class="painel-grafico-carteira">
+            <div class="titulo-grafico-carteira">
+                <div>
+                    <h2>Distribuição por categoria</h2>
+                    <p>Valor investido em cada categoria</p>
+                </div>
+            </div>
+
+            <?php if (empty($labelsCategoriasCarteira)): ?>
+                <p class="grafico-carteira-vazio">
+                    Adicione ativos para visualizar a distribuição.
+                </p>
+            <?php else: ?>
+                <div class="grafico-carteira-container grafico-categoria-carteira">
+                    <canvas id="graficoCategoriasCarteira"></canvas>
+                </div>
+            <?php endif; ?>
+        </article>
+    </section>
 
 
     <!-- =========================================================
@@ -551,23 +596,44 @@
                          ================================================= -->
 
                     <div class="acoes-ativo">
+                        <details class="movimentacao-ativo movimentacao-compra">
+                            <summary class="btn-comprar">Compra</summary>
+                            <form action="comprar_ativo.php" method="POST" class="form-movimentacao">
+                                <input type="hidden" name="id" value="<?= (int) $ativo["id"] ?>">
+                                <label>
+                                    Quantidade
+                                    <input type="number" name="quantidade" min="1" step="1" required>
+                                </label>
+                                <label>
+                                    Preço de compra
+                                    <input type="number" name="preco_medio" min="0" step="0.01" value="<?= htmlspecialchars(number_format((float) $ativo["preco_medio"], 2, ".", "")) ?>" required>
+                                </label>
+                                <label>
+                                    Data da compra
+                                    <input type="date" name="data_compra" value="<?= date('Y-m-d') ?>">
+                                </label>
+                                <button type="submit" class="btn-confirmar-compra">Confirmar compra</button>
+                            </form>
+                        </details>
 
-                        <a
-                            href="editar_ativo.php?id=<?= $ativo["id"] ?>&carteira=<?= $carteira_id ?>"
-                            class="btn-editar"
-                        >
-                            Editar
-                        </a>
-
-
-                        <a
-                            href="excluir_ativo.php?id=<?= $ativo["id"] ?>&carteira=<?= $carteira_id ?>"
-                            class="btn-excluir"
-                            onclick="return confirm('Tem certeza que deseja excluir este ativo?');"
-                        >
-                            Excluir
-                        </a>
-
+                        <details class="movimentacao-ativo movimentacao-venda">
+                            <summary class="btn-vender">Venda</summary>
+                            <form action="vender_ativo.php" method="POST" class="form-movimentacao" onsubmit="return confirm('Confirmar a venda desta quantidade?');">
+                                <input type="hidden" name="id" value="<?= (int) $ativo["id"] ?>">
+                                <label>
+                                    Quantidade
+                                    <input type="number" name="quantidade" min="1" max="<?= (int) $ativo["quantidade"] ?>" step="1" required>
+                                </label>
+                                <label>
+                                    Preço de venda
+                                    <input type="number" name="preco_medio" min="0" step="0.01" placeholder="Opcional">
+                                </label>
+                                <div class="saldo-disponivel">
+                                    Disponível: <strong><?= (int) $ativo["quantidade"] ?></strong>
+                                </div>
+                                <button type="submit" class="btn-confirmar-venda">Confirmar venda</button>
+                            </form>
+                        </details>
                     </div>
 
 
@@ -624,6 +690,17 @@
                                     "data_compra" => "Data da compra",
                                     "observacao" => "Observação",
                                 ];
+                                $acaoExibida = $registro["entidade"] === "Ativo"
+                                    ? ($registro["acao"] === "criou"
+                                        ? "Compra"
+                                        : ($registro["acao"] === "comprou"
+                                            ? "Compra"
+                                            : ($registro["acao"] === "excluiu"
+                                            ? "Venda"
+                                            : ($registro["acao"] === "vendeu"
+                                                ? "Venda"
+                                                : ucfirst($registro["acao"])))))
+                                    : ucfirst($registro["acao"]);
                             ?>
                             <tr>
                                 <td>
@@ -634,7 +711,7 @@
                                 </td>
                                 <td>
                                     <span class="acao-historico acao-<?= htmlspecialchars($registro["acao"]) ?>">
-                                        <?= htmlspecialchars(ucfirst($registro["acao"])) ?>
+                                        <?= htmlspecialchars($acaoExibida) ?>
                                     </span>
                                 </td>
                                 <td class="descricao-historico">
@@ -711,6 +788,157 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const labelsEvolucaoCarteira = <?= json_encode($labelsEvolucaoCarteira, JSON_UNESCAPED_UNICODE) ?>;
+const valoresEvolucaoCarteira = <?= json_encode($valoresEvolucaoCarteira) ?>;
+const labelsCategoriasCarteira = <?= json_encode($labelsCategoriasCarteira, JSON_UNESCAPED_UNICODE) ?>;
+const valoresCategoriasCarteira = <?= json_encode($valoresCategoriasCarteira) ?>;
+
+const formatarMoedaGrafico = valor =>
+    "R$ " + Number(valor).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+const canvasEvolucao = document.getElementById("graficoEvolucaoCarteira");
+if (canvasEvolucao && labelsEvolucaoCarteira.length > 0) {
+    new Chart(canvasEvolucao, {
+        type: "line",
+        data: {
+            labels: labelsEvolucaoCarteira,
+            datasets: [{
+                label: "Patrimônio",
+                data: valoresEvolucaoCarteira,
+                borderColor: "#00a86b",
+                backgroundColor: "rgba(0, 168, 107, 0.12)",
+                borderWidth: 3,
+                tension: 0.32,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: "#00a86b"
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: contexto => " " + formatarMoedaGrafico(contexto.parsed.y)
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: "#75807c" }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: "#75807c",
+                        callback: valor => formatarMoedaGrafico(valor)
+                    },
+                    grid: { color: "#edf1ef" }
+                }
+            }
+        }
+    });
+}
+
+const canvasCategorias = document.getElementById("graficoCategoriasCarteira");
+if (canvasCategorias && labelsCategoriasCarteira.length > 0) {
+    const totalCategoriasCarteira = valoresCategoriasCarteira.reduce(
+        (total, valor) => total + Number(valor),
+        0
+    );
+
+    new Chart(canvasCategorias, {
+        type: "doughnut",
+        data: {
+            labels: labelsCategoriasCarteira,
+            datasets: [{
+                data: valoresCategoriasCarteira,
+                backgroundColor: [
+                    "#00a86b",
+                    "#2878c8",
+                    "#f39c12",
+                    "#8e44ad",
+                    "#d64545",
+                    "#17a2b8"
+                ],
+                borderColor: "#ffffff",
+                borderWidth: 3,
+                hoverOffset: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "68%",
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        color: "#75807c",
+                        usePointStyle: true,
+                        padding: 14,
+                        boxWidth: 8
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: contexto => {
+                            const valor = Number(contexto.parsed);
+                            const percentual = totalCategoriasCarteira > 0
+                                ? (valor / totalCategoriasCarteira) * 100
+                                : 0;
+                            return " " + contexto.label + ": "
+                                + formatarMoedaGrafico(valor)
+                                + " (" + percentual.toLocaleString("pt-BR", {
+                                    minimumFractionDigits: 1,
+                                    maximumFractionDigits: 1
+                                }) + "%)";
+                        }
+                    }
+                }
+            }
+        },
+        plugins: [{
+            id: "centroCategoriaCarteira",
+            beforeDraw: chart => {
+                const area = chart.chartArea;
+                if (!area) {
+                    return;
+                }
+
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillStyle = "#75807c";
+                ctx.font = "600 12px Arial";
+                ctx.fillText(
+                    "TOTAL INVESTIDO",
+                    (area.left + area.right) / 2,
+                    (area.top + area.bottom) / 2 - 10
+                );
+                ctx.fillStyle = "#202925";
+                ctx.font = "700 16px Arial";
+                ctx.fillText(
+                    formatarMoedaGrafico(totalCategoriasCarteira),
+                    (area.left + area.right) / 2,
+                    (area.top + area.bottom) / 2 + 12
+                );
+                ctx.restore();
+            }
+        }]
+    });
+}
+</script>
 </body>
 
 </html>

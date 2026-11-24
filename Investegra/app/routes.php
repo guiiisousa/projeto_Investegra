@@ -34,6 +34,8 @@ $router->add("processando_ativo", "AtivoController", "store");
 $router->add("editar_ativo", "AtivoController", "edit");
 $router->add("atualizar_ativo", "AtivoController", "update");
 $router->add("excluir_ativo", "AtivoController", "destroy");
+ $router->add("comprar_ativo", "AtivoController", "comprar");
+ $router->add("vender_ativo", "AtivoController", "vender");
 
 /* Dashboard e análises */
 $router->add("dashboard", "DashboardController", "index");
@@ -62,5 +64,8 @@ $router->add("meu_perfil", "PerfilController", "perfil");
 $router->add("api/chat", "ApiController", "chat");
 $router->add("api/cotacao", "ApiController", "cotacao");
 $router->add("api/buscar_ativos", "ApiController", "buscarAtivos");
+
+/* Assistente de IA */
+$router->add("chat", "ChatController", "index");
 
 return $router;

@@ -473,7 +473,13 @@
                     <?php foreach ($atividades as $atividade): ?>
                         <?php
                             $letra = strtoupper(substr($atividade["entidade"], 0, 1));
-                            $acao = ucfirst($atividade["acao"]);
+                            $acao = $atividade["entidade"] === "Ativo"
+                                ? ($atividade["acao"] === "criou"
+                                    ? "Compra"
+                                    : ($atividade["acao"] === "excluiu"
+                                        ? "Venda"
+                                        : ucfirst($atividade["acao"])))
+                                : ucfirst($atividade["acao"]);
                         ?>
                         <article class="item-atividade">
                             <div class="icone-atividade"><?= htmlspecialchars($letra) ?></div>

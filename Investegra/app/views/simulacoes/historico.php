@@ -55,11 +55,7 @@
                 Carteiras
             </a>
 
-            <a href="ativos.php">
-                Ativos
-            </a>
-
-            <a href="simulacao.php">
+            <a href="simulacao.php" class="ativo">
                 Simulações
             </a>
 
@@ -73,13 +69,6 @@
 
             <a href="alertas.php">
                 Alertas
-            </a>
-
-            <a
-                href="historico_simulacoes.php"
-                class="ativo"
-            >
-                Histórico
             </a>
 
             <a href="logout.php">
@@ -114,12 +103,21 @@
             </div>
 
 
-            <a
-                href="simulacao.php"
-                class="btn-nova"
-            >
-                + Nova simulação
-            </a>
+            <div class="acoes-historico">
+                <a
+                    href="simulacao.php"
+                    class="voltar"
+                >
+                    ← Voltar para simulações
+                </a>
+
+                <a
+                    href="simulacao.php"
+                    class="btn-nova"
+                >
+                    + Nova simulação
+                </a>
+            </div>
 
         </div>
 

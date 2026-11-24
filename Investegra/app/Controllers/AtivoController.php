@@ -39,14 +39,83 @@ class AtivoController extends Controller
         }
 
         $resumo = Ativo::resumir($ativos, CotacaoService::obter($tickers));
+        $ativos = $resumo["ativos"];
         $historicoCarteira = Historico::atividadesPorCarteira(
             $usuarioId,
             $carteira_id
         );
 
+        $labelsCategoriasCarteira = [];
+        $valoresCategoriasCarteira = [];
+        $categoriasCarteira = [];
+
+        foreach ($ativos as $ativo) {
+            $categoria = $ativo["categoria"] ?? "Sem categoria";
+            $categoriasCarteira[$categoria] =
+                ($categoriasCarteira[$categoria] ?? 0)
+                + (float) $ativo["valor_investido"];
+        }
+
+        arsort($categoriasCarteira);
+
+        foreach ($categoriasCarteira as $categoria => $valor) {
+            $labelsCategoriasCarteira[] = $categoria;
+            $valoresCategoriasCarteira[] = round((float) $valor, 2);
+        }
+
+        $labelsEvolucaoCarteira = [];
+        $valoresEvolucaoCarteira = [];
+        $patrimonioEvolucao = 0.0;
+
+        foreach (array_reverse($historicoCarteira) as $registro) {
+            $detalhes = !empty($registro["detalhes"])
+                ? json_decode($registro["detalhes"], true)
+                : null;
+
+            if (!is_array($detalhes) || $registro["entidade"] !== "Ativo") {
+                continue;
+            }
+
+            if (isset($detalhes["antes"], $detalhes["depois"])) {
+                $antes = (float) ($detalhes["antes"]["quantidade"] ?? 0)
+                    * (float) ($detalhes["antes"]["preco_medio"] ?? 0);
+                $depois = (float) ($detalhes["depois"]["quantidade"] ?? 0)
+                    * (float) ($detalhes["depois"]["preco_medio"] ?? 0);
+                $patrimonioEvolucao += $depois - $antes;
+            } elseif ($registro["acao"] === "criou") {
+                $patrimonioEvolucao +=
+                    (float) ($detalhes["quantidade"] ?? 0)
+                    * (float) ($detalhes["preco_medio"] ?? 0);
+            } elseif ($registro["acao"] === "excluiu") {
+                $patrimonioEvolucao -=
+                    (float) ($detalhes["quantidade"] ?? 0)
+                    * (float) ($detalhes["preco_medio"] ?? 0);
+            }
+
+            $patrimonioEvolucao = max(0, $patrimonioEvolucao);
+            $labelsEvolucaoCarteira[] = date(
+                "d/m",
+                strtotime($registro["data_registro"])
+            );
+            $valoresEvolucaoCarteira[] = round($patrimonioEvolucao, 2);
+        }
+
+        if (empty($labelsEvolucaoCarteira) && count($ativos) > 0) {
+            $labelsEvolucaoCarteira[] = "Atual";
+            $valoresEvolucaoCarteira[] = round($totalInvestido, 2);
+        }
+
         $this->view("ativos/index", array_merge(
             $resumo,
-            compact("carteira", "carteira_id", "historicoCarteira")
+            compact(
+                "carteira",
+                "carteira_id",
+                "historicoCarteira",
+                "labelsCategoriasCarteira",
+                "valoresCategoriasCarteira",
+                "labelsEvolucaoCarteira",
+                "valoresEvolucaoCarteira"
+            )
         ));
     }
 
@@ -102,7 +171,7 @@ class AtivoController extends Controller
                 $usuarioId,
                 "criou",
                 "Ativo",
-                "Ativo criado: " . strtoupper(trim($dados["ticker"])),
+                "Ativo comprado: " . strtoupper(trim($dados["ticker"])),
                 $id_carteira,
                 ["ticker" => $dados["ticker"], "quantidade" => $dados["quantidade"], "preco_medio" => $dados["preco_medio"], "data_compra" => $dados["data_compra"], "observacao" => $dados["observacao"]]
             );
@@ -189,6 +258,134 @@ class AtivoController extends Controller
         $this->redirect($destino . "&erro=1");
     }
 
+    public function comprar()
+    {
+        $usuarioId = $this->requireLogin();
+
+        if (!$this->isPost()) {
+            $this->redirect("carteiras.php");
+        }
+
+        $id = filter_input(INPUT_POST, "id", FILTER_VALIDATE_INT);
+        $quantidade = filter_input(INPUT_POST, "quantidade", FILTER_VALIDATE_INT);
+        $preco = filter_input(INPUT_POST, "preco_medio", FILTER_VALIDATE_FLOAT);
+        $dataCompra = trim($_POST["data_compra"] ?? "");
+
+        if (!$id || !$quantidade || $quantidade < 1 || $preco === false || $preco === null || $preco < 0) {
+            $this->redirect("carteiras.php?erro=1");
+        }
+
+        $ativo = Ativo::findOwned($id, $usuarioId);
+
+        if (!$ativo) {
+            $this->redirect("carteiras.php?erro=1");
+        }
+
+        $quantidadeAtual = (int) $ativo["quantidade"];
+        $precoAtual = (float) $ativo["preco_medio"];
+        $novaQuantidade = $quantidadeAtual + (int) $quantidade;
+        $precoMedioNovo = $novaQuantidade > 0
+            ? (($quantidadeAtual * $precoAtual) + ((int) $quantidade * (float) $preco)) / $novaQuantidade
+            : (float) $preco;
+
+        $dados = [
+            "ticker" => $ativo["ticker"],
+            "categoria_id" => (int) $ativo["categoria_id"],
+            "quantidade" => $novaQuantidade,
+            "preco_medio" => $precoMedioNovo,
+            "data_compra" => $dataCompra !== "" ? $dataCompra : $ativo["data_compra"],
+            "observacao" => $ativo["observacao"] ?? "",
+        ];
+
+        $destino = "ativos.php?carteira=" . $ativo["carteira_id"];
+
+        if (Ativo::update($id, $dados)) {
+            Historico::registrarPatrimonio($usuarioId);
+            Historico::registrarAtividade(
+                $usuarioId,
+                "comprou",
+                "Ativo",
+                "Compra realizada: " . strtoupper($ativo["ticker"]),
+                (int) $ativo["carteira_id"],
+                [
+                    "antes" => ["quantidade" => $quantidadeAtual, "preco_medio" => $precoAtual],
+                    "depois" => ["quantidade" => $novaQuantidade, "preco_medio" => $precoMedioNovo],
+                    "quantidade_comprada" => (int) $quantidade,
+                    "preco_compra" => (float) $preco,
+                    "data_compra" => $dados["data_compra"],
+                ]
+            );
+            $this->redirect($destino . "&sucesso=1");
+        }
+
+        $this->redirect($destino . "&erro=1");
+    }
+
+    public function vender()
+    {
+        $usuarioId = $this->requireLogin();
+
+        if (!$this->isPost()) {
+            $this->redirect("carteiras.php");
+        }
+
+        $id = filter_input(INPUT_POST, "id", FILTER_VALIDATE_INT);
+        $quantidade = filter_input(INPUT_POST, "quantidade", FILTER_VALIDATE_INT);
+        $preco = filter_input(INPUT_POST, "preco_medio", FILTER_VALIDATE_FLOAT);
+
+        if (!$id || !$quantidade || $quantidade < 1) {
+            $this->redirect("carteiras.php?erro=1");
+        }
+
+        $ativo = Ativo::findOwned($id, $usuarioId);
+
+        if (!$ativo) {
+            $this->redirect("carteiras.php?erro=1");
+        }
+
+        $quantidadeAtual = (int) $ativo["quantidade"];
+
+        if ($quantidade > $quantidadeAtual) {
+            $destino = "ativos.php?carteira=" . $ativo["carteira_id"];
+            $this->redirect($destino . "&erro=quantidade");
+        }
+
+        $novaQuantidade = $quantidadeAtual - (int) $quantidade;
+        $destino = "ativos.php?carteira=" . $ativo["carteira_id"];
+        $precoVenda = $preco !== false && $preco !== null ? (float) $preco : null;
+
+        $ok = $novaQuantidade === 0
+            ? Ativo::delete($id)
+            : Ativo::update($id, [
+                "ticker" => $ativo["ticker"],
+                "categoria_id" => (int) $ativo["categoria_id"],
+                "quantidade" => $novaQuantidade,
+                "preco_medio" => (float) $ativo["preco_medio"],
+                "data_compra" => $ativo["data_compra"],
+                "observacao" => $ativo["observacao"] ?? "",
+            ]);
+
+        if ($ok) {
+            Historico::registrarPatrimonio($usuarioId);
+            Historico::registrarAtividade(
+                $usuarioId,
+                "vendeu",
+                "Ativo",
+                "Venda realizada: " . strtoupper($ativo["ticker"]),
+                (int) $ativo["carteira_id"],
+                [
+                    "antes" => ["quantidade" => $quantidadeAtual],
+                    "depois" => ["quantidade" => $novaQuantidade],
+                    "quantidade_vendida" => (int) $quantidade,
+                    "preco_venda" => $precoVenda,
+                ]
+            );
+            $this->redirect($destino . "&sucesso=1");
+        }
+
+        $this->redirect($destino . "&erro=1");
+    }
+
     public function destroy()
     {
         $usuarioId = $this->requireLogin();
@@ -213,7 +410,7 @@ class AtivoController extends Controller
                 $usuarioId,
                 "excluiu",
                 "Ativo",
-                "Ativo excluído: " . strtoupper(trim($ativo["ticker"])),
+                "Ativo vendido: " . strtoupper(trim($ativo["ticker"])),
                 (int) $ativo["carteira_id"],
                 ["ticker" => $ativo["ticker"], "quantidade" => $ativo["quantidade"], "preco_medio" => $ativo["preco_medio"], "data_compra" => $ativo["data_compra"], "observacao" => $ativo["observacao"]]
             );
