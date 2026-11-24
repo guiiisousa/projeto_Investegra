@@ -15,7 +15,7 @@
 
     <link
         rel="stylesheet"
-        href="css/ativos.css"
+        href="css/ativos.css?v=4"
     >
     <link
         rel="stylesheet"
@@ -55,24 +55,24 @@
                 Carteiras
             </a>
 
-            <a href="#">
+            <a href="simulacao.php">
                 Simulações
             </a>
 
-            <a href="#">
+            <a href="analises.php">
                 Análises
             </a>
 
-            <a href="#">
+            <a href="recomendacoes.php">
                 Recomendações
             </a>
 
-            <a href="#">
+            <a href="historico.php">
                 Histórico
             </a>
 
-            <a href="#">
-                Indicadores
+            <a href="alertas.php">
+                Alertas
             </a>
 
         </nav>
@@ -239,19 +239,19 @@
                     type="number"
                     id="quantidade"
                     name="quantidade"
-                    step="0.0001"
-                    min="0.0001"
+                    step="1"
+                    min="1"
                     placeholder="Ex.: 10"
                     required
                 >
 
 
                 <!-- =========================
-                     PREÇO MÉDIO
+                     PREÇO DE COMPRA
                 ========================== -->
 
                 <label for="preco_medio">
-                    Preço médio
+                    Preço de compra
                 </label>
 
 
@@ -261,7 +261,7 @@
                     name="preco_medio"
                     step="0.01"
                     min="0"
-                    placeholder="Ex.: 35.50"
+                    placeholder="Cotação atual será preenchida"
                     required
                 >
 
@@ -367,6 +367,21 @@ const resultados =
 const ativoSelecionado =
     document.getElementById(
         "ativo_selecionado"
+    );
+
+const campoPrecoMedio =
+    document.getElementById(
+        "preco_medio"
+    );
+
+const campoDataCompra =
+    document.getElementById(
+        "data_compra"
+    );
+
+const campoCategoria =
+    document.getElementById(
+        "categoria_id"
     );
 
 
@@ -515,7 +530,7 @@ campoBusca.addEventListener(
 
                             item.addEventListener(
                                 "click",
-                                function () {
+                                async function () {
 
 
                                     /*
@@ -534,6 +549,107 @@ campoBusca.addEventListener(
 
                                     campoTicker.value =
                                         ativo.ticker;
+
+
+                                    /*
+                                     * Preenche categoria e data
+                                     * com dados úteis da API e da
+                                     * seleção atual.
+                                     */
+
+                                    if (ativo.categoria) {
+                                        Array.from(
+                                            campoCategoria.options
+                                        ).forEach(function (opcao) {
+                                            if (
+                                                opcao.textContent.trim()
+                                                === ativo.categoria
+                                            ) {
+                                                campoCategoria.value =
+                                                    opcao.value;
+                                            }
+                                        });
+                                    }
+
+                                    if (
+                                        !campoDataCompra.value
+                                    ) {
+                                        const hoje =
+                                            new Date();
+                                        const ano =
+                                            hoje.getFullYear();
+                                        const mes =
+                                            String(
+                                                hoje.getMonth() + 1
+                                            ).padStart(2, "0");
+                                        const dia =
+                                            String(
+                                                hoje.getDate()
+                                            ).padStart(2, "0");
+
+                                        campoDataCompra.value =
+                                            ano + "-" + mes + "-" + dia;
+                                    }
+
+
+                                    /*
+                                     * Consulta a cotação atual
+                                     * e usa o valor no preço de compra.
+                                     */
+
+                                    campoPrecoMedio.value =
+                                        "";
+                                    campoPrecoMedio.placeholder =
+                                        "Buscando cotação atual...";
+
+                                    try {
+                                        const cotacaoResposta =
+                                            await fetch(
+                                                "api/cotacao.php?ticker=" +
+                                                encodeURIComponent(
+                                                    ativo.ticker
+                                                )
+                                            );
+                                        const cotacao =
+                                            await cotacaoResposta.json();
+
+                                        if (
+                                            cotacao.sucesso &&
+                                            cotacao.ativo &&
+                                            cotacao.ativo.preco_atual
+                                            !== null
+                                        ) {
+                                            campoPrecoMedio.value =
+                                                Number(
+                                                    cotacao.ativo.preco_atual
+                                                ).toFixed(2);
+                                            campoPrecoMedio.placeholder =
+                                                "Cotação atual preenchida";
+
+                                            ativoSelecionado.textContent =
+                                                "Ativo selecionado: " +
+                                                ativo.ticker +
+                                                " — Cotação atual: R$ " +
+                                                Number(
+                                                    cotacao.ativo.preco_atual
+                                                ).toLocaleString(
+                                                    "pt-BR",
+                                                    {
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2,
+                                                    }
+                                                );
+                                        } else {
+                                            campoPrecoMedio.placeholder =
+                                                "Digite o preço de compra";
+                                        }
+                                    } catch (erro) {
+                                        campoPrecoMedio.placeholder =
+                                            "Digite o preço de compra";
+                                        ativoSelecionado.textContent =
+                                            "Ativo selecionado: " +
+                                            ativo.ticker;
+                                    }
 
 
                                     /*

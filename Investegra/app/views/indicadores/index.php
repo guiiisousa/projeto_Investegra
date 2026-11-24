@@ -64,12 +64,6 @@
                 Histórico
             </a>
 
-            <a
-                href="indicadores.php"
-                class="ativo"
-            >
-                Indicadores
-            </a>
 
             <a 
                 href="alertas.php"

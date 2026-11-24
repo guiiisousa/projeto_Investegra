@@ -12,6 +12,7 @@ class HistoricoController extends Controller
         $usuarioId = $this->requireLogin();
 
         $historico = Historico::todos($usuarioId);
+        $atividades = Historico::atividades($usuarioId);
 
         /* Estatísticas gerais */
         $patrimonio_atual = 0;
@@ -74,7 +75,7 @@ class HistoricoController extends Controller
         }
 
         $this->view("historico/index", compact(
-            "historico", "historico_completo",
+            "historico", "historico_completo", "atividades",
             "patrimonio_atual", "maior_patrimonio", "menor_patrimonio",
             "variacao_total", "percentual_total"
         ));

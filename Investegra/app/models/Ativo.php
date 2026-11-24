@@ -57,7 +57,7 @@ class Ativo extends Model
                 (carteira_id, categoria_id, ticker, quantidade,
                  preco_medio, data_compra, observacao)
              VALUES (?, ?, ?, ?, ?, ?, ?)",
-            "iisddss",
+            "iisidss",
             [
                 $d["carteira_id"], $d["categoria_id"], $d["ticker"],
                 $d["quantidade"], $d["preco_medio"],
@@ -73,7 +73,7 @@ class Ativo extends Model
              SET ticker = ?, categoria_id = ?, quantidade = ?,
                  preco_medio = ?, data_compra = ?, observacao = ?
              WHERE id = ?",
-            "siddssi",
+            "siidssi",
             [
                 $d["ticker"], $d["categoria_id"], $d["quantidade"],
                 $d["preco_medio"], $d["data_compra"], $d["observacao"], $id,

@@ -19,13 +19,15 @@ class Carteira extends Model
         );
     }
 
-    public static function create(string $nome, string $descricao, int $usuarioId): bool
+    public static function create(string $nome, string $descricao, int $usuarioId): ?int
     {
-        return self::execute(
+        $ok = self::execute(
             "INSERT INTO carteiras (nome, descricao, usuario_id) VALUES (?, ?, ?)",
             "ssi",
             [$nome, $descricao, $usuarioId]
         );
+
+        return $ok ? (int) self::db()->insert_id : null;
     }
 
     public static function update(int $id, int $usuarioId, string $nome, string $descricao): bool

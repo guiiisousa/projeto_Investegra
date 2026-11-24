@@ -12,7 +12,7 @@ function formatarPercentual($valor)
 
 function formatarQuantidade($valor)
 {
-    return number_format($valor, 4, ",", ".");
+    return number_format((int) $valor, 0, "", ".");
 }
 
 function classeResultado($valor)

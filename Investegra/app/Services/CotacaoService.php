@@ -149,7 +149,11 @@ class CotacaoService
 
             /* Procura tanto pelo ticker quanto pelo nome. */
             if (stripos($ticker, $termo) !== false || stripos($nome, $termo) !== false) {
-                $resultados[] = ["ticker" => $ticker, "nome" => $nome];
+                $resultados[] = [
+                    "ticker" => $ticker,
+                    "nome" => $nome,
+                    "categoria" => self::inferirCategoria($ticker, $nome),
+                ];
             }
 
             /* Não precisamos retornar centenas de resultados. */
@@ -162,6 +166,40 @@ class CotacaoService
     }
 
     /* ---------- internos ---------- */
+
+    private static function inferirCategoria(string $ticker, string $nome): string
+    {
+        $texto = strtoupper($ticker . " " . $nome);
+
+        if (
+            str_contains($texto, "CRYPTO")
+            || str_contains($texto, "CRIPT")
+            || str_contains($texto, "BITCOIN")
+            || str_contains($texto, "ETHEREUM")
+        ) {
+            return "Criptomoedas";
+        }
+
+        if (
+            str_contains($texto, "ETF")
+            || str_contains($texto, "ISHARES")
+            || str_contains($texto, "TREND")
+            || str_contains($texto, "IT NOW")
+        ) {
+            return "ETFs";
+        }
+
+        if (
+            preg_match('/[0-9]11$/', $ticker)
+            || str_contains($texto, "FII")
+            || str_contains($texto, "FUNDO IMOBILI")
+            || str_contains($texto, "FUNDO DE INVESTIMENTO IMOBILI")
+        ) {
+            return "FIIs";
+        }
+
+        return "Ações";
+    }
 
     /* Converte um resultado da brapi no formato usado pelo sistema. */
     private static function normalizar(array $resultado, string $ticker): array

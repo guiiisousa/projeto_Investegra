@@ -67,10 +67,6 @@
                 Histórico
             </a>
 
-            <a href="indicadores.php">
-                Indicadores
-            </a>
-
             <a href="alertas.php">
                 Alertas
             </a>
@@ -214,6 +210,52 @@
 
             <?php endif; ?>
 
+
+        </section>
+
+
+        <br>
+
+
+        <!-- INDICADORES -->
+
+        <section class="painel">
+
+            <h2>
+                Indicadores da carteira
+            </h2>
+
+            <br>
+
+            <div class="cards cards-indicadores">
+
+                <div class="card">
+                    <span>Carteiras</span>
+                    <strong><?= (int) $total_carteiras ?></strong>
+                </div>
+
+                <div class="card">
+                    <span>Média por carteira</span>
+                    <strong>
+                        R$ <?= number_format($media_carteira, 2, ",", ".") ?>
+                    </strong>
+                </div>
+
+                <div class="card">
+                    <span>Ativo de maior valor</span>
+                    <strong>
+                        <?= htmlspecialchars($maior_ativo["ticker"] ?? "Nenhum") ?>
+                    </strong>
+                </div>
+
+                <div class="card">
+                    <span>Maior categoria</span>
+                    <strong>
+                        <?= htmlspecialchars($maior_categoria["categoria"] ?? "Nenhuma") ?>
+                    </strong>
+                </div>
+
+            </div>
 
         </section>
 

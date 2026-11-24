@@ -566,6 +566,84 @@ a {
     margin-bottom: 13px;
 }
 
+.historico-carteira {
+    margin-top: 27px;
+    padding-top: 23px;
+    border-top: 1px solid #edf1ef;
+}
+
+.historico-carteira h3 {
+    margin-bottom: 13px;
+    color: #27332e;
+    font-size: 17px;
+}
+
+.historico-carteira-vazio {
+    color: #7a8580;
+    font-size: 14px;
+}
+
+.lista-historico-carteira {
+    display: grid;
+    gap: 8px;
+}
+
+.item-historico-carteira {
+    display: grid;
+    grid-template-columns: 82px minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #edf1ef;
+    border-radius: 10px;
+    background: #f7f9f8;
+}
+
+.tipo-historico-carteira {
+    display: inline-flex;
+    justify-content: center;
+    width: 82px;
+    padding: 6px 8px;
+    border-radius: 999px;
+    background: #e9f7f1;
+    color: #008f5a;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.conteudo-historico-carteira {
+    min-width: 0;
+}
+
+.item-historico-carteira strong {
+    color: #27332e;
+    font-size: 14px;
+}
+
+.detalhes-historico {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-top: 7px;
+}
+
+.detalhes-historico span {
+    color: #7a8580;
+    font-size: 13px;
+}
+
+.detalhes-historico b {
+    color: #53615b;
+    font-weight: 600;
+}
+
+.item-historico-carteira time {
+    padding-top: 2px;
+    color: #7a8580;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
 
 /* =========================================================
    LISTA DE ATIVOS
@@ -993,6 +1071,14 @@ a {
         grid-template-columns: 1fr;
 
         padding: 14px;
+    }
+
+    .item-historico-carteira {
+        grid-template-columns: 1fr;
+    }
+
+    .tipo-historico-carteira {
+        width: fit-content;
     }
 
 

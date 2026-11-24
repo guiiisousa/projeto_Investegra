@@ -35,7 +35,6 @@
         <a href="analises.php">Análises</a>
         <a href="recomendacoes.php">Recomendações</a>
         <a href="historico.php">Histórico</a>
-        <a href="indicadores.php">Indicadores</a>
         <a href="alertas.php" class="ativo">Alertas</a>
     </nav>
 

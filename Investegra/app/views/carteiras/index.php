@@ -17,7 +17,7 @@
 
     <link
         rel="stylesheet"
-        href="css/carteiras.css"
+        href="css/carteiras.css?v=2"
     >
     <link
         rel="stylesheet"
@@ -40,10 +40,9 @@
         <?php require BASE_PATH . "/app/views/partials/perfil_nav.php"; ?>
         <a href="carteiras.php" class="ativo">Carteiras</a>
         <a href="simulacao.php">Simulações</a>
-        <a href="analise_carteira.php">Análises</a>
+        <a href="analises.php">Análises</a>
         <a href="recomendacoes.php">Recomendações</a>
         <a href="historico.php">Histórico</a>
-        <a href="indicadores.php">Indicadores</a>
         <a href="alertas.php">Alertas</a>
     </nav>
 
@@ -414,9 +413,9 @@
                                             <strong>
 
                                                 <?= number_format(
-                                                    $ativo["quantidade"],
-                                                    4,
-                                                    ",",
+                                                    (int) $ativo["quantidade"],
+                                                    0,
+                                                    "",
                                                     "."
                                                 ) ?>
 
@@ -428,7 +427,7 @@
                                         <div class="ativo-dado">
 
                                             <span>
-                                                Preço médio
+                                                Preço de compra
                                             </span>
 
                                             <strong>
@@ -521,6 +520,87 @@
                         </div>
 
                     <?php endif; ?>
+
+
+                    <!-- =================================================
+                         HISTÓRICO DA CARTEIRA
+                         ================================================= -->
+
+                    <div class="historico-carteira">
+                        <h3>Histórico da carteira</h3>
+
+                        <?php if (empty($carteira["historico"])): ?>
+                            <p class="historico-carteira-vazio">
+                                Nenhuma alteração registrada nesta carteira.
+                            </p>
+                        <?php else: ?>
+                            <div class="lista-historico-carteira">
+                                <?php foreach ($carteira["historico"] as $atividade): ?>
+                                    <?php
+                                        $detalhes = !empty($atividade["detalhes"])
+                                            ? json_decode($atividade["detalhes"], true)
+                                            : null;
+                                        $rotulosDetalhes = [
+                                            "ticker" => "Ativo",
+                                            "nome" => "Nome",
+                                            "descricao" => "Descrição",
+                                            "quantidade" => "Quantidade",
+                                            "preco_medio" => "Preço de compra",
+                                            "data_compra" => "Data da compra",
+                                            "observacao" => "Observação",
+                                        ];
+                                    ?>
+                                    <article class="item-historico-carteira">
+                                        <span class="tipo-historico-carteira">
+                                            <?= htmlspecialchars(ucfirst($atividade["acao"])) ?>
+                                        </span>
+                                        <div class="conteudo-historico-carteira">
+                                            <strong><?= htmlspecialchars($atividade["descricao"]) ?></strong>
+                                            <?php if (is_array($detalhes)): ?>
+                                                <?php if (isset($detalhes["antes"]) && isset($detalhes["depois"])): ?>
+                                                    <div class="detalhes-historico">
+                                                        <?php foreach ($detalhes["depois"] as $chave => $valor): ?>
+                                                            <?php
+                                                                $antes = $detalhes["antes"][$chave] ?? null;
+                                                                $rotulo = $rotulosDetalhes[$chave] ?? ucfirst(str_replace("_", " ", $chave));
+                                                                if ($antes == $valor) {
+                                                                    continue;
+                                                                }
+                                                            ?>
+                                                            <span>
+                                                                <?= htmlspecialchars($rotulo) ?>:
+                                                                <b><?= htmlspecialchars((string) $antes) ?></b>
+                                                                →
+                                                                <b><?= htmlspecialchars(is_scalar($valor) ? (string) $valor : "") ?></b>
+                                                            </span>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                <?php elseif (!empty($detalhes)): ?>
+                                                    <div class="detalhes-historico">
+                                                        <?php foreach ($detalhes as $chave => $valor): ?>
+                                                            <?php
+                                                                if (!$chave || $valor === null || $valor === "") {
+                                                                    continue;
+                                                                }
+                                                                $rotulo = $rotulosDetalhes[$chave] ?? ucfirst(str_replace("_", " ", $chave));
+                                                            ?>
+                                                            <span>
+                                                                <?= htmlspecialchars($rotulo) ?>:
+                                                                <b><?= htmlspecialchars(is_scalar($valor) ? (string) $valor : "") ?></b>
+                                                            </span>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                            <?php endif; ?>
+                                        </div>
+                                        <time datetime="<?= htmlspecialchars($atividade["data_registro"]) ?>">
+                                            <?= date("d/m/Y H:i", strtotime($atividade["data_registro"])) ?>
+                                        </time>
+                                    </article>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
 
 
                     <!-- =================================================

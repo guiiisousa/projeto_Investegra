@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Session;
 use App\Models\Usuario;
+use App\Models\Historico;
 use App\Services\AnaliseIAService;
 use App\Services\PerfilService;
 
@@ -30,6 +31,13 @@ class PerfilController extends Controller
         if (!Usuario::salvarPerfil($usuarioId, $dados)) {
             $this->abort("Erro ao salvar o perfil.");
         }
+
+        Historico::registrarAtividade(
+            $usuarioId,
+            "editou",
+            "Perfil",
+            "Perfil de investidor atualizado"
+        );
 
         Session::setQuizConcluido(true);
 

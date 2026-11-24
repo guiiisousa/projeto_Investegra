@@ -177,6 +177,59 @@
 
         }
 
+        .lista-atividades {
+            display: grid;
+            gap: 12px;
+        }
+
+        .item-atividade {
+            display: grid;
+            grid-template-columns: 44px 1fr auto;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+        }
+
+        .icone-atividade {
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #e9f7f1;
+            color: #00a86b;
+            font-weight: bold;
+        }
+
+        .item-atividade strong {
+            display: block;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .item-atividade p {
+            margin: 0;
+            color: #666;
+        }
+
+        .item-atividade time {
+            color: #888;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 650px) {
+            .item-atividade {
+                grid-template-columns: 44px 1fr;
+            }
+
+            .item-atividade time {
+                grid-column: 2;
+            }
+        }
+
 
         @media (max-width: 1000px) {
 
@@ -249,9 +302,6 @@
                 class="ativo"
             >
                 Histórico
-            </a>
-            <a href="indicadores.php">
-                Indicadores
             </a>
             <a href="alertas.php">
                 Alertas
@@ -406,6 +456,39 @@
         <!-- =================================================
              GRÁFICO
         ================================================== -->
+
+        <section class="painel">
+            <div class="painel-topo">
+                <div>
+                    <h2>Alterações realizadas</h2>
+                </div>
+            </div>
+
+            <?php if (count($atividades) === 0): ?>
+                <p class="sem-registros">
+                    Nenhuma alteração foi registrada ainda.
+                </p>
+            <?php else: ?>
+                <div class="lista-atividades">
+                    <?php foreach ($atividades as $atividade): ?>
+                        <?php
+                            $letra = strtoupper(substr($atividade["entidade"], 0, 1));
+                            $acao = ucfirst($atividade["acao"]);
+                        ?>
+                        <article class="item-atividade">
+                            <div class="icone-atividade"><?= htmlspecialchars($letra) ?></div>
+                            <div>
+                                <strong><?= htmlspecialchars($acao) ?> <?= htmlspecialchars($atividade["entidade"]) ?></strong>
+                                <p><?= htmlspecialchars($atividade["descricao"]) ?></p>
+                            </div>
+                            <time datetime="<?= htmlspecialchars($atividade["data_registro"]) ?>">
+                                <?= date("d/m/Y H:i", strtotime($atividade["data_registro"])) ?>
+                            </time>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
 
         <section class="painel">
 

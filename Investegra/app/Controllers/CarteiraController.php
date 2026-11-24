@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\Carteira;
+use App\Models\Historico;
 
 class CarteiraController extends Controller
 {
@@ -12,6 +13,13 @@ class CarteiraController extends Controller
         $usuarioId = $this->requireLogin();
 
         $carteiras = Carteira::resumoPorUsuario($usuarioId);
+
+        foreach ($carteiras as $id => $carteira) {
+            $carteiras[$id]["historico"] = Historico::atividadesPorCarteira(
+                $usuarioId,
+                (int) $id
+            );
+        }
 
         $this->view("carteiras/index", compact("carteiras"));
     }
@@ -66,7 +74,17 @@ class CarteiraController extends Controller
             $this->redirect("nova_carteira.php?erro=nome");
         }
 
-        if (Carteira::create($nome, $descricao, $usuarioId)) {
+        $carteiraId = Carteira::create($nome, $descricao, $usuarioId);
+
+        if ($carteiraId !== null) {
+            Historico::registrarAtividade(
+                $usuarioId,
+                "criou",
+                "Carteira",
+                "Carteira criada: " . $nome,
+                $carteiraId,
+                ["nome" => $nome, "descricao" => $descricao]
+            );
             $this->redirect("carteiras.php?sucesso=1");
         }
 
@@ -109,11 +127,32 @@ class CarteiraController extends Controller
             $this->redirect("carteiras.php?erro=1");
         }
 
+        $carteira = Carteira::find($id, $usuarioId);
+
+        if (!$carteira) {
+            $this->redirect("carteiras.php?erro=1");
+        }
+
         if (strlen($nome) > 100) {
             $this->redirect("editar_carteira.php?id=" . $id . "&erro=1");
         }
 
         if (Carteira::update($id, $usuarioId, $nome, $descricao)) {
+            $anterior = $carteira ?? [];
+            Historico::registrarAtividade(
+                $usuarioId,
+                "editou",
+                "Carteira",
+                "Carteira atualizada: " . $nome,
+                $id,
+                [
+                    "antes" => [
+                        "nome" => $anterior["nome"] ?? null,
+                        "descricao" => $anterior["descricao"] ?? null,
+                    ],
+                    "depois" => ["nome" => $nome, "descricao" => $descricao],
+                ]
+            );
             $this->redirect("carteiras.php?sucesso=1");
         }
 
@@ -130,7 +169,17 @@ class CarteiraController extends Controller
             $this->redirect("carteiras.php?erro=1");
         }
 
+        $carteira = Carteira::find($id, $usuarioId);
+
         if (Carteira::delete($id, $usuarioId)) {
+            Historico::registrarAtividade(
+                $usuarioId,
+                "excluiu",
+                "Carteira",
+                "Carteira excluída: " . ($carteira["nome"] ?? "Sem nome"),
+                $id,
+                ["nome" => $carteira["nome"] ?? null, "descricao" => $carteira["descricao"] ?? null]
+            );
             $this->redirect("carteiras.php?sucesso=1");
         }
 

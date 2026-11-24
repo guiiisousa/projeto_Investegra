@@ -16,7 +16,7 @@
 
     <link
         rel="stylesheet"
-        href="css/ativos.css"
+        href="css/ativos.css?v=3"
     >
     <link
         rel="stylesheet"
@@ -26,6 +26,8 @@
 </head>
 
 <body>
+
+<div class="layout">
 
 <aside class="sidebar">
 
@@ -39,16 +41,17 @@
         <?php require BASE_PATH . "/app/views/partials/perfil_nav.php"; ?>
         <a href="carteiras.php" class="ativo">Carteiras</a>
         <a href="simulacao.php">Simulações</a>
-        <a href="analise_carteira.php">Análises</a>
+        <a href="analises.php">Análises</a>
         <a href="recomendacoes.php">Recomendações</a>
         <a href="historico.php">Histórico</a>
-        <a href="indicadores.php">Indicadores</a>
         <a href="alertas.php">Alertas</a>
     </nav>
 
     <a href="logout.php" class="logout">Sair</a>
 
 </aside>
+
+<main class="conteudo">
 
 <div class="container">
 
@@ -76,14 +79,17 @@
         </div>
 
         <div class="acoes-topo">
-            <a href="carteiras.php" class="btn-voltar">
+            <a
+                href="carteiras.php"
+                class="btn-voltar-carteiras"
+            >
                 ← Voltar para carteiras
             </a>
             <a
                 href="novo_ativo.php?carteira=<?= $carteira_id ?>"
-                class="btn-principal"
+                class="btn-principal btn-adicionar-ativo"
             >
-                + Adicionar Ativo
+                + Adicionar ativo
             </a>
         </div>
 
@@ -215,6 +221,13 @@
          LISTA DE ATIVOS
          ========================================================= -->
 
+    <section class="secao-ativos">
+
+        <div class="secao-ativos-titulo">
+            <h2>Ativos da carteira</h2>
+            <span><?= count($ativos) ?> <?= count($ativos) === 1 ? "ativo" : "ativos" ?></span>
+        </div>
+
     <?php if (empty($ativos)): ?>
 
         <div class="estado-vazio">
@@ -335,7 +348,7 @@
                         <div class="informacao">
 
                             <span>
-                                Preço médio
+                                Preço de compra
                             </span>
 
                             <strong>
@@ -567,6 +580,109 @@
 
     <?php endif; ?>
 
+    </section>
+
+
+    <!-- =========================================================
+         HISTÓRICO DA CARTEIRA
+         ========================================================= -->
+
+    <section class="secao-historico-carteira">
+
+        <div class="secao-historico-titulo">
+            <h2>Histórico da carteira</h2>
+            <span><?= count($historicoCarteira) ?> <?= count($historicoCarteira) === 1 ? "registro" : "registros" ?></span>
+        </div>
+
+        <?php if (empty($historicoCarteira)): ?>
+            <div class="historico-carteira-vazio">
+                Nenhuma alteração foi registrada nesta carteira.
+            </div>
+        <?php else: ?>
+            <div class="tabela-historico-carteira-container">
+                <table class="tabela-historico-carteira">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Ação</th>
+                            <th>Descrição</th>
+                            <th>Detalhes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($historicoCarteira as $registro): ?>
+                            <?php
+                                $detalhes = !empty($registro["detalhes"])
+                                    ? json_decode($registro["detalhes"], true)
+                                    : [];
+                                $rotulos = [
+                                    "ticker" => "Ativo",
+                                    "nome" => "Nome",
+                                    "descricao" => "Descrição",
+                                    "quantidade" => "Quantidade",
+                                    "preco_medio" => "Preço de compra",
+                                    "data_compra" => "Data da compra",
+                                    "observacao" => "Observação",
+                                ];
+                            ?>
+                            <tr>
+                                <td>
+                                    <time datetime="<?= htmlspecialchars($registro["data_registro"]) ?>">
+                                        <?= date("d/m/Y", strtotime($registro["data_registro"])) ?>
+                                        <small><?= date("H:i", strtotime($registro["data_registro"])) ?></small>
+                                    </time>
+                                </td>
+                                <td>
+                                    <span class="acao-historico acao-<?= htmlspecialchars($registro["acao"]) ?>">
+                                        <?= htmlspecialchars(ucfirst($registro["acao"])) ?>
+                                    </span>
+                                </td>
+                                <td class="descricao-historico">
+                                    <?= htmlspecialchars($registro["descricao"]) ?>
+                                </td>
+                                <td>
+                                    <?php if (isset($detalhes["antes"], $detalhes["depois"]) && is_array($detalhes["antes"]) && is_array($detalhes["depois"])): ?>
+                                        <div class="detalhes-tabela-historico">
+                                            <?php foreach ($detalhes["depois"] as $chave => $valor): ?>
+                                                <?php
+                                                    $antes = $detalhes["antes"][$chave] ?? null;
+                                                    if ($antes == $valor) {
+                                                        continue;
+                                                    }
+                                                    $rotulo = $rotulos[$chave] ?? ucfirst(str_replace("_", " ", $chave));
+                                                ?>
+                                                <span>
+                                                    <?= htmlspecialchars($rotulo) ?>:
+                                                    <b><?= htmlspecialchars((string) $antes) ?></b>
+                                                    → <b><?= htmlspecialchars(is_scalar($valor) ? (string) $valor : "") ?></b>
+                                                </span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php elseif (is_array($detalhes)): ?>
+                                        <div class="detalhes-tabela-historico">
+                                            <?php foreach ($detalhes as $chave => $valor): ?>
+                                                <?php
+                                                    if ($valor === null || $valor === "") {
+                                                        continue;
+                                                    }
+                                                    $rotulo = $rotulos[$chave] ?? ucfirst(str_replace("_", " ", $chave));
+                                                ?>
+                                                <span>
+                                                    <?= htmlspecialchars($rotulo) ?>:
+                                                    <b><?= htmlspecialchars(is_scalar($valor) ? (string) $valor : "") ?></b>
+                                                </span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </section>
+
 
     <!-- =========================================================
          AVISO
@@ -588,6 +704,10 @@
         </div>
 
     <?php endif; ?>
+
+</div>
+
+</main>
 
 </div>
 

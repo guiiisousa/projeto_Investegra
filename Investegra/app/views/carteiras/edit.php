@@ -52,24 +52,24 @@
                 Carteiras
             </a>
 
-            <a href="#">
+            <a href="simulacao.php">
                 Simulações
             </a>
 
-            <a href="#">
+            <a href="analises.php">
                 Análises
             </a>
 
-            <a href="#">
+            <a href="recomendacoes.php">
                 Recomendações
             </a>
 
-            <a href="#">
+            <a href="historico.php">
                 Histórico
             </a>
 
-            <a href="#">
-                Indicadores
+            <a href="alertas.php">
+                Alertas
             </a>
 
         </nav>

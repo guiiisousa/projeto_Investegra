@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\Simulacao;
+use App\Models\Historico;
 use App\Services\SimulacaoService;
 
 class SimulacaoController extends Controller
@@ -64,6 +65,18 @@ class SimulacaoController extends Controller
         if ($id === null) {
             $this->abort("Erro ao salvar a simulação.");
         }
+
+        Historico::registrarAtividade(
+            $usuarioId,
+            "criou",
+            "Simulação",
+            "Nova simulação criada: R$ " . number_format(
+                (float) $calculo["montante"],
+                2,
+                ",",
+                "."
+            )
+        );
 
         $_SESSION["resultado_simulacao"] = [
             "id" => $id,

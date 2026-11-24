@@ -50,24 +50,24 @@
                 Carteiras
             </a>
 
-            <a href="#">
+            <a href="simulacao.php">
                 Simulações
             </a>
 
-            <a href="#">
+            <a href="analises.php">
                 Análises
             </a>
 
-            <a href="#">
+            <a href="recomendacoes.php">
                 Recomendações
             </a>
 
-            <a href="#">
+            <a href="historico.php">
                 Histórico
             </a>
 
-            <a href="#">
-                Indicadores
+            <a href="alertas.php">
+                Alertas
             </a>
 
         </nav>
@@ -187,17 +187,17 @@
                     type="number"
                     id="quantidade"
                     name="quantidade"
-                    step="0.0001"
-                    min="0.0001"
+                    step="1"
+                    min="1"
                     value="<?= htmlspecialchars(
-                        $ativo["quantidade"]
+                        (string) (int) $ativo["quantidade"]
                     ) ?>"
                     required
                 >
 
 
                 <label for="preco_medio">
-                    Preço médio
+                    Preço de compra
                 </label>
 
                 <input

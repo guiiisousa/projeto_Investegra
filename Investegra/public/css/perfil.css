@@ -33,9 +33,23 @@ a {
 }
 
 .profile-page {
-    width: min(100% - 48px, 940px);
-    margin: 0 auto;
-    padding: 28px 0 32px;
+    width: min(1180px, calc(100% - 96px)) !important;
+    max-width: none;
+    margin: 0 auto 0 24px;
+    padding: 35px 24px 60px 24px;
+}
+
+.profile-heading {
+    padding-bottom: 20px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid #edf1ef;
+}
+
+.profile-card,
+.logout-card {
+    border: 1px solid #e6ece9;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(25, 45, 37, 0.055);
 }
 
 .topbar {
@@ -472,8 +486,9 @@ a {
 
 @media (max-width: 620px) {
     .profile-page {
-        width: min(100% - 32px, 940px);
-        padding-top: 19px;
+        width: calc(100% - 32px) !important;
+        margin-left: 16px;
+        padding: 19px 16px 32px;
     }
 
     .topbar {

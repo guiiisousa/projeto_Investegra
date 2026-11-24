@@ -47,7 +47,7 @@ $valorOuPadrao = static function ($value) use ($escape): string {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f5f7f4">
     <title>Meu perfil | Investegra</title>
-    <link rel="stylesheet" href="css/perfil.css">
+    <link rel="stylesheet" href="css/perfil.css?v=5">
     <link rel="stylesheet" href="css/nav-reveal.css?v=2">
 </head>
 <body>
@@ -60,16 +60,15 @@ $valorOuPadrao = static function ($value) use ($escape): string {
                 <?php $perfilNavAtivo = true; require BASE_PATH . "/app/views/partials/perfil_nav.php"; ?>
                 <a href="carteiras.php">Carteiras</a>
                 <a href="simulacao.php">Simulações</a>
-                <a href="analise_carteira.php">Análises</a>
+                <a href="analises.php">Análises</a>
                 <a href="recomendacoes.php">Recomendações</a>
                 <a href="historico.php">Histórico</a>
-                <a href="indicadores.php">Indicadores</a>
                 <a href="alertas.php">Alertas</a>
             </nav>
             <a href="logout.php" class="logout">Sair</a>
         </aside>
 
-        <main class="profile-page">
+        <main class="conteudo profile-page">
             <section class="profile-heading" aria-labelledby="page-title">
                 <p class="eyebrow">SUA CONTA</p>
                 <h1 id="page-title">Meu perfil</h1>

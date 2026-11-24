@@ -29,61 +29,24 @@ class AnaliseController extends Controller
             $valores[] = (float) $categoria["valor"];
         }
 
+        $total_carteiras = Carteira::contar($usuarioId);
+        $media_carteira = $total_carteiras > 0
+            ? $patrimonio / $total_carteiras
+            : 0;
+        $maior_ativo = Ativo::maiorAtivo($usuarioId);
+        $maior_categoria = Ativo::maiorCategoria($usuarioId);
+
         $this->view("analises/index", compact(
             "patrimonio", "total_ativos", "categorias",
-            "carteira_principal", "labels", "valores"
+            "carteira_principal", "labels", "valores",
+            "total_carteiras", "media_carteira",
+            "maior_ativo", "maior_categoria"
         ));
     }
 
     /* Análise da carteira feita pela IA. */
     public function carteira()
     {
-        $usuarioId = $this->requireLogin();
-
-        $usuario = Usuario::perfil($usuarioId);
-
-        if (!$usuario) {
-            $this->abort("Usuário não encontrado.");
-        }
-
-        $resumo = Ativo::resumoPatrimonio($usuarioId);
-        $patrimonio = $resumo["patrimonio"];
-        $quantidade_ativos = $resumo["quantidade_ativos"];
-
-        $distribuicao = [];
-
-        foreach (Ativo::distribuicaoPorCategoria($usuarioId) as $categoria) {
-            $distribuicao[$categoria["categoria"]] = $patrimonio > 0
-                ? ((float) $categoria["valor"] / $patrimonio) * 100
-                : 0;
-        }
-
-        $alertas = Alerta::mensagensNaoLidas($usuarioId);
-
-        $analise = AnaliseIAService::analisarCarteira([
-            "perfil" => $usuario["perfil_risco"] ?? "Não informado",
-            "score" => (int) ($usuario["score_risco"] ?? 0),
-            "experiencia" => $usuario["experiencia"] ?? "Não informado",
-            "horizonte" => $usuario["horizonte_investimento"] ?? "Não informado",
-            "objetivo" => $usuario["objetivo"] ?? "Não informado",
-            "patrimonio" => $patrimonio,
-            "quantidade_ativos" => $quantidade_ativos,
-            "distribuicao" => $distribuicao,
-            "alertas" => $alertas,
-        ]);
-
-        $esc = function ($valor) {
-            return htmlspecialchars($valor ?? "Não informado", ENT_QUOTES, "UTF-8");
-        };
-
-        $perfil = $esc($usuario["perfil_risco"]);
-        $experiencia = $esc($usuario["experiencia"]);
-        $horizonte = $esc($usuario["horizonte_investimento"]);
-        $objetivo = $esc($usuario["objetivo"]);
-
-        $this->view("analises/carteira", compact(
-            "usuario", "patrimonio", "quantidade_ativos", "distribuicao",
-            "alertas", "analise", "perfil", "experiencia", "horizonte", "objetivo"
-        ));
+        $this->redirect("analises.php");
     }
 }

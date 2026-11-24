@@ -107,6 +107,23 @@ CREATE TABLE `historico_patrimonio` (
 -- --------------------------------------------------------
 
 --
+-- Estrutura para tabela `historico_atividades`
+--
+
+CREATE TABLE `historico_atividades` (
+  `id` int NOT NULL,
+  `usuario_id` int NOT NULL,
+  `acao` varchar(30) NOT NULL,
+  `entidade` varchar(50) NOT NULL,
+  `descricao` varchar(255) NOT NULL,
+  `carteira_id` int DEFAULT NULL,
+  `detalhes` text,
+  `data_registro` datetime DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura para tabela `recomendacoes`
 --
 
@@ -205,6 +222,14 @@ ALTER TABLE `historico_patrimonio`
   ADD KEY `usuario_id` (`usuario_id`);
 
 --
+-- Índices de tabela `historico_atividades`
+--
+ALTER TABLE `historico_atividades`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `usuario_id` (`usuario_id`),
+  ADD KEY `carteira_id` (`carteira_id`);
+
+--
 -- Índices de tabela `recomendacoes`
 --
 ALTER TABLE `recomendacoes`
@@ -260,6 +285,12 @@ ALTER TABLE `historico_patrimonio`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de tabela `historico_atividades`
+--
+ALTER TABLE `historico_atividades`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de tabela `recomendacoes`
 --
 ALTER TABLE `recomendacoes`
@@ -305,6 +336,12 @@ ALTER TABLE `carteiras`
 --
 ALTER TABLE `historico_patrimonio`
   ADD CONSTRAINT `historico_patrimonio_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
+
+--
+-- Restrições para tabela `historico_atividades`
+--
+ALTER TABLE `historico_atividades`
+  ADD CONSTRAINT `historico_atividades_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 
 --
 -- Restrições para tabelas `recomendacoes`

@@ -39,10 +39,14 @@ class AtivoController extends Controller
         }
 
         $resumo = Ativo::resumir($ativos, CotacaoService::obter($tickers));
+        $historicoCarteira = Historico::atividadesPorCarteira(
+            $usuarioId,
+            $carteira_id
+        );
 
         $this->view("ativos/index", array_merge(
             $resumo,
-            compact("carteira", "carteira_id")
+            compact("carteira", "carteira_id", "historicoCarteira")
         ));
     }
 
@@ -94,6 +98,14 @@ class AtivoController extends Controller
 
         if (Ativo::create($dados)) {
             Historico::registrarPatrimonio($usuarioId);
+            Historico::registrarAtividade(
+                $usuarioId,
+                "criou",
+                "Ativo",
+                "Ativo criado: " . strtoupper(trim($dados["ticker"])),
+                $id_carteira,
+                ["ticker" => $dados["ticker"], "quantidade" => $dados["quantidade"], "preco_medio" => $dados["preco_medio"], "data_compra" => $dados["data_compra"], "observacao" => $dados["observacao"]]
+            );
 
             $this->redirect("ativos.php?carteira=" . $id_carteira . "&sucesso=1");
         }
@@ -147,6 +159,29 @@ class AtivoController extends Controller
 
         if (Ativo::update($id, $dados)) {
             Historico::registrarPatrimonio($usuarioId);
+            Historico::registrarAtividade(
+                $usuarioId,
+                "editou",
+                "Ativo",
+                "Ativo atualizado: " . strtoupper(trim($dados["ticker"])),
+                (int) $ativo["carteira_id"],
+                [
+                    "antes" => [
+                        "ticker" => $ativo["ticker"],
+                        "quantidade" => $ativo["quantidade"],
+                        "preco_medio" => $ativo["preco_medio"],
+                        "data_compra" => $ativo["data_compra"],
+                        "observacao" => $ativo["observacao"],
+                    ],
+                    "depois" => [
+                        "ticker" => $dados["ticker"],
+                        "quantidade" => $dados["quantidade"],
+                        "preco_medio" => $dados["preco_medio"],
+                        "data_compra" => $dados["data_compra"],
+                        "observacao" => $dados["observacao"],
+                    ],
+                ]
+            );
 
             $this->redirect($destino . "&sucesso=1");
         }
@@ -174,6 +209,14 @@ class AtivoController extends Controller
 
         if (Ativo::delete($id)) {
             Historico::registrarPatrimonio($usuarioId);
+            Historico::registrarAtividade(
+                $usuarioId,
+                "excluiu",
+                "Ativo",
+                "Ativo excluído: " . strtoupper(trim($ativo["ticker"])),
+                (int) $ativo["carteira_id"],
+                ["ticker" => $ativo["ticker"], "quantidade" => $ativo["quantidade"], "preco_medio" => $ativo["preco_medio"], "data_compra" => $ativo["data_compra"], "observacao" => $ativo["observacao"]]
+            );
 
             $this->redirect($destino . "&sucesso=1");
         }
@@ -190,7 +233,7 @@ class AtivoController extends Controller
         return [
             "ticker" => strtoupper(trim($_POST["ticker"] ?? "")),
             "categoria_id" => filter_input(INPUT_POST, "categoria_id", FILTER_VALIDATE_INT),
-            "quantidade" => filter_input(INPUT_POST, "quantidade", FILTER_VALIDATE_FLOAT),
+            "quantidade" => filter_input(INPUT_POST, "quantidade", FILTER_VALIDATE_INT),
             "preco_medio" => filter_input(INPUT_POST, "preco_medio", FILTER_VALIDATE_FLOAT),
             "data_compra" => $data === "" ? null : $data,
             "observacao" => trim($_POST["observacao"] ?? ""),

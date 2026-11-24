@@ -182,7 +182,7 @@
             </a>
 
 
-            <a href="analise_carteira.php">
+            <a href="analises.php">
                 Análises
             </a>
 
@@ -196,10 +196,6 @@
                 Histórico
             </a>
 
-
-            <a href="indicadores.php">
-                Indicadores
-            </a>
 
 
             <a href="alertas.php">
@@ -432,7 +428,7 @@
                     </h2>
 
 
-                    <a href="analise_carteira.php">
+                    <a href="analises.php">
                         Ver análise
                     </a>
 
@@ -580,7 +576,7 @@
                 </h2>
 
 
-                <a href="analise_carteira.php">
+                <a href="analises.php">
                     Analisar carteira
                 </a>
 
