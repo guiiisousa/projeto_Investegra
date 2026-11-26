@@ -52,7 +52,6 @@ $objetivoLabel = [
                 <a href="analises.php">Análises</a>
                 <a href="recomendacoes.php">Recomendações</a>
                 <a href="historico.php">Histórico</a>
-                <a href="alertas.php">Alertas</a>
             </nav>
             <a href="logout.php" class="logout">Sair</a>
         </aside>

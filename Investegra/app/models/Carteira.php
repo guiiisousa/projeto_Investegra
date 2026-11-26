@@ -68,7 +68,7 @@ class Carteira extends Model
             $c["total_investido"] = 0;
             $c["total_atual"] = 0;
             $c["resultado"] = 0;
-            $c["cotacoes_disponiveis"] = 0;
+            $c["ativos_sem_cotacao"] = 0;
             $c["total_ativos"] = 0;
 
             $carteiras[$c["id"]] = $c;
@@ -79,16 +79,7 @@ class Carteira extends Model
         }
 
         $ativos = Ativo::allByUser($usuarioId);
-
-        $tickers = [];
-
-        foreach ($ativos as $a) {
-            if (!empty($a["ticker"])) {
-                $tickers[] = strtoupper(trim($a["ticker"]));
-            }
-        }
-
-        $cotacoes = CotacaoService::obter($tickers);
+        $cotacoes = CotacaoService::obterParaAtivos($ativos);
 
         foreach ($ativos as $a) {
 
@@ -103,10 +94,16 @@ class Carteira extends Model
             $carteiras[$id]["total_investido"] += $a["valor_investido"];
             $carteiras[$id]["total_ativos"]++;
 
+            if (
+                strcasecmp(trim((string) ($a["categoria"] ?? "")), "Renda Fixa") !== 0
+                && $a["preco_atual"] === null
+            ) {
+                $carteiras[$id]["ativos_sem_cotacao"]++;
+            }
+
             if ($a["valor_atual"] !== null) {
                 $carteiras[$id]["total_atual"] += $a["valor_atual"];
                 $carteiras[$id]["resultado"] += $a["resultado"];
-                $carteiras[$id]["cotacoes_disponiveis"]++;
             }
 
             $carteiras[$id]["ativos"][] = $a;

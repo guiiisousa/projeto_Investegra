@@ -213,6 +213,13 @@ a {
     font-size: 15px;
 }
 
+.topo-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
 
 /* =========================================================
    BOTÃO PRINCIPAL
@@ -687,6 +694,13 @@ a {
         border-color 0.2s ease;
 }
 
+.linha-ativo.renda-fixa {
+    grid-template-columns:
+        minmax(140px, 1.4fr)
+        repeat(2, minmax(110px, 1fr))
+        auto;
+}
+
 
 .linha-ativo:hover {
     background: #f5faf8;
@@ -922,15 +936,16 @@ a {
 
     .linha-ativo {
         grid-template-columns:
-            1.5fr
-            repeat(2, 1fr)
+            minmax(130px, 1.3fr)
+            repeat(4, minmax(95px, 1fr))
             auto;
     }
 
-
-    .linha-ativo .ativo-dado:nth-of-type(3),
-    .linha-ativo .ativo-dado:nth-of-type(4) {
-        display: none;
+    .linha-ativo.renda-fixa {
+        grid-template-columns:
+            minmax(130px, 1.3fr)
+            repeat(2, minmax(110px, 1fr))
+            auto;
     }
 }
 
@@ -977,6 +992,11 @@ a {
         gap: 13px;
     }
 
+    .linha-ativo.renda-fixa {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
 
     .linha-ativo .ativo-identificacao {
         grid-column: 1 / -1;
@@ -994,10 +1014,6 @@ a {
     }
 
 
-    .linha-ativo .ativo-dado:nth-of-type(3),
-    .linha-ativo .ativo-dado:nth-of-type(4) {
-        display: block;
-    }
 }
 
 

@@ -55,11 +55,74 @@ class ApiController extends Controller
         $this->json($corpo, $status);
     }
 
+    public function cotacaoFii()
+    {
+        $this->requireLoginJson();
+        $ticker = $_GET["ticker"] ?? "";
+
+        if (!is_string($ticker)) {
+            $this->json(["sucesso" => false, "mensagem" => "Ticker de FII inválido."], 400);
+        }
+
+        [$status, $corpo] = CotacaoService::cotacaoFii($ticker);
+
+        $this->json($corpo, $status);
+    }
+
+    public function cotacaoEtf()
+    {
+        $this->requireLoginJson();
+        $ticker = $_GET["ticker"] ?? "";
+
+        if (!is_string($ticker)) {
+            $this->json(["sucesso" => false, "mensagem" => "Ticker de ETF inválido."], 400);
+        }
+
+        [$status, $corpo] = CotacaoService::cotacaoEtf($ticker);
+
+        $this->json($corpo, $status);
+    }
+
+    public function cotacaoCripto()
+    {
+        $this->requireLoginJson();
+        $ticker = $_GET["ticker"] ?? "";
+
+        if (!is_string($ticker)) {
+            $this->json(["sucesso" => false, "mensagem" => "Ticker de criptomoeda inválido."], 400);
+        }
+
+        [$status, $corpo] = CotacaoService::cotacaoCripto($ticker);
+
+        $this->json($corpo, $status);
+    }
+
+    public function dadosFii()
+    {
+        $this->requireLoginJson();
+        $ticker = $_GET["ticker"] ?? "";
+
+        if (!is_string($ticker)) {
+            $this->json(["sucesso" => false, "mensagem" => "Ticker de FII inválido."], 400);
+        }
+
+        [$status, $corpo] = CotacaoService::dadosFii($ticker);
+
+        $this->json($corpo, $status);
+    }
+
     public function buscarAtivos()
     {
         $this->requireLoginJson();
 
-        [$status, $corpo] = CotacaoService::buscarAtivos($_GET["termo"] ?? "");
+        $termo = $_GET["termo"] ?? "";
+        $categoria = $_GET["categoria"] ?? null;
+
+        if (!is_string($termo) || ($categoria !== null && !is_string($categoria))) {
+            $this->json(["sucesso" => false, "mensagem" => "Parâmetros de busca inválidos."], 400);
+        }
+
+        [$status, $corpo] = CotacaoService::buscarAtivos($termo, $categoria);
 
         $this->json($corpo, $status);
     }

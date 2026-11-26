@@ -7,6 +7,9 @@ class CotacaoService
 {
     private const URL_COTACAO = "https://brapi.dev/api/v2/stocks/quote?symbols=";
     private const URL_LISTA = "https://brapi.dev/api/quote/list";
+    private const URL_TICKERS = "https://brapi.dev/api/v2/tickers?search=";
+    private const URL_INDICADORES_FII = "https://brapi.dev/api/v2/fii/indicators?symbols=";
+    private const URL_COTACAO_CRIPTO = "https://brapi.dev/api/v2/crypto?coin=";
     private const REGEX_TICKER = '/^[A-Z0-9^.-]{1,20}$/';
 
     /*
@@ -66,6 +69,46 @@ class CotacaoService
         return $cotacoes;
     }
 
+    public static function obterParaAtivos(array $ativos): array
+    {
+        $acoes = [];
+        $consultasEspecificas = [];
+
+        foreach ($ativos as $ativo) {
+            $ticker = strtoupper(trim((string) ($ativo["ticker"] ?? "")));
+            $categoria = trim((string) ($ativo["categoria"] ?? ""));
+
+            if ($ticker === "") {
+                continue;
+            }
+
+            if ($categoria === "Ações") {
+                $acoes[] = $ticker;
+            } elseif (in_array($categoria, ["FIIs", "ETFs", "Criptomoedas"], true)) {
+                $consultasEspecificas[$categoria . ":" . $ticker] = [
+                    "categoria" => $categoria,
+                    "ticker" => $ticker,
+                ];
+            }
+        }
+
+        $cotacoes = self::obter($acoes);
+
+        foreach ($consultasEspecificas as $consulta) {
+            [$status, $resposta] = match ($consulta["categoria"]) {
+                "FIIs" => self::cotacaoFii($consulta["ticker"]),
+                "ETFs" => self::cotacaoEtf($consulta["ticker"]),
+                default => self::cotacaoCripto($consulta["ticker"]),
+            };
+
+            if ($status === 200 && is_array($resposta["ativo"] ?? null)) {
+                $cotacoes[$consulta["ticker"]] = $resposta["ativo"];
+            }
+        }
+
+        return $cotacoes;
+    }
+
     /* Cotação de um único ticker. Devolve [status HTTP, corpo da resposta]. */
     public static function cotacaoUnica(string $ticker): array
     {
@@ -109,8 +152,258 @@ class CotacaoService
         ]];
     }
 
+    /* Preço atual e DY mensal de um FII selecionado. */
+    public static function dadosFii(string $ticker): array
+    {
+        $ticker = strtoupper(trim($ticker));
+
+        if (!preg_match(self::REGEX_TICKER, $ticker)) {
+            return [400, ["sucesso" => false, "mensagem" => "Ticker de FII inválido."]];
+        }
+
+        $cotacao = self::obterCotacaoFii($ticker);
+
+        if ($cotacao === null) {
+            return [502, [
+                "sucesso" => false,
+                "mensagem" => "A Brapi não retornou uma cotação atual válida para esse FII.",
+            ]];
+        }
+
+        [$corpo, $codigo, $erro] = self::http(
+            self::URL_INDICADORES_FII . urlencode($ticker)
+        );
+
+        if ($corpo === false) {
+            return [502, [
+                "sucesso" => false,
+                "mensagem" => "Não foi possível consultar o dividend yield na Brapi.",
+                "detalhes" => $erro,
+            ]];
+        }
+
+        if ($codigo === 401 || $codigo === 403) {
+            return [$codigo, [
+                "sucesso" => false,
+                "mensagem" => "A Brapi exige acesso Pro para os indicadores deste FII. Configure BRAPI_API_KEY no ambiente do servidor.",
+            ]];
+        }
+
+        if ($codigo !== 200) {
+            return [502, [
+                "sucesso" => false,
+                "mensagem" => "A Brapi não conseguiu retornar os indicadores deste FII.",
+                "codigo_http" => $codigo,
+            ]];
+        }
+
+        $dadosIndicadores = json_decode($corpo, true);
+        $indicador = null;
+
+        foreach (($dadosIndicadores["fiis"] ?? []) as $resultado) {
+            if (strtoupper((string) ($resultado["symbol"] ?? "")) === $ticker) {
+                $indicador = $resultado;
+                break;
+            }
+        }
+
+        $dyMensalRaw = $indicador["dividendYield1m"] ?? null;
+        if (
+            !is_numeric($dyMensalRaw)
+            || !is_finite((float) $dyMensalRaw)
+            || (float) $dyMensalRaw < 0
+        ) {
+            return [502, [
+                "sucesso" => false,
+                "mensagem" => "A Brapi não retornou o dividend yield mensal deste FII.",
+            ]];
+        }
+
+        return [200, [
+            "sucesso" => true,
+            "ativo" => [
+                "ticker" => $ticker,
+                "nome" => $cotacao["nome"],
+                "preco_atual" => $cotacao["preco_atual"],
+                "variacao_percentual" => $cotacao["variacao_percentual"],
+                "dy_mensal" => (float) $dyMensalRaw * 100,
+                "data_referencia_dy" => $indicador["asOfDate"] ?? null,
+            ],
+        ]];
+    }
+
+    /* Cotação de FII sem exigir acesso aos indicadores Pro. */
+    public static function cotacaoFii(string $ticker): array
+    {
+        $ticker = strtoupper(trim($ticker));
+
+        if (!preg_match(self::REGEX_TICKER, $ticker)) {
+            return [400, ["sucesso" => false, "mensagem" => "Ticker de FII inválido."]];
+        }
+
+        $cotacao = self::obterCotacaoFii($ticker);
+
+        if ($cotacao === null) {
+            return [502, [
+                "sucesso" => false,
+                "mensagem" => "A Brapi não retornou uma cotação atual válida para esse FII.",
+            ]];
+        }
+
+        return [200, [
+            "sucesso" => true,
+            "ativo" => [
+                "ticker" => $ticker,
+                "nome" => $cotacao["nome"],
+                "preco_atual" => $cotacao["preco_atual"],
+                "variacao_percentual" => $cotacao["variacao_percentual"],
+            ],
+        ]];
+    }
+
+    public static function cotacaoEtf(string $ticker): array
+    {
+        $ticker = strtoupper(trim($ticker));
+
+        if (!preg_match(self::REGEX_TICKER, $ticker)) {
+            return [400, ["sucesso" => false, "mensagem" => "Ticker de ETF inválido."]];
+        }
+
+        $dados = self::consultarJson(
+            self::URL_TICKERS
+                . urlencode($ticker)
+                . "&subType=etf&limit=10"
+        );
+
+        if ($dados === null) {
+            return [502, [
+                "sucesso" => false,
+                "mensagem" => "Não foi possível consultar a cotação do ETF na Brapi.",
+            ]];
+        }
+
+        foreach (($dados["results"] ?? []) as $resultado) {
+            if (
+                strtoupper((string) ($resultado["symbol"] ?? "")) !== $ticker
+                || ($resultado["subType"] ?? "") !== "etf"
+            ) {
+                continue;
+            }
+
+            $quote = $resultado["quote"] ?? [];
+            $preco = $quote["lastPrice"] ?? null;
+            $variacao = $quote["changePercent"] ?? null;
+
+            if (
+                !is_numeric($preco)
+                || !is_finite((float) $preco)
+                || (float) $preco <= 0
+            ) {
+                return [502, [
+                    "sucesso" => false,
+                    "mensagem" => "A Brapi não retornou uma cotação válida para este ETF.",
+                ]];
+            }
+
+            return [200, [
+                "sucesso" => true,
+                "ativo" => [
+                    "ticker" => $ticker,
+                    "nome" => $resultado["longName"]
+                        ?? $resultado["name"]
+                        ?? $ticker,
+                    "preco_atual" => (float) $preco,
+                    "variacao_percentual" => is_numeric($variacao)
+                        && is_finite((float) $variacao)
+                        ? (float) $variacao
+                        : null,
+                ],
+            ]];
+        }
+
+        return [404, [
+            "sucesso" => false,
+            "mensagem" => "ETF não encontrado na Brapi.",
+        ]];
+    }
+
+    public static function cotacaoCripto(string $ticker): array
+    {
+        $ticker = strtoupper(trim($ticker));
+
+        if (!preg_match('/^[A-Z0-9]{2,12}$/', $ticker)) {
+            return [400, ["sucesso" => false, "mensagem" => "Ticker de criptomoeda inválido."]];
+        }
+
+        [$corpo, $codigo, $erro] = self::http(
+            self::URL_COTACAO_CRIPTO
+                . urlencode($ticker)
+                . "&currency=BRL"
+        );
+
+        if ($corpo === false) {
+            return [502, [
+                "sucesso" => false,
+                "mensagem" => "Não foi possível consultar a cotação da criptomoeda na Brapi.",
+                "detalhes" => $erro,
+            ]];
+        }
+
+        if ($codigo === 401 || $codigo === 403) {
+            return [$codigo, [
+                "sucesso" => false,
+                "mensagem" => "A Brapi exige uma chave de acesso para consultar criptomoedas. Configure BRAPI_API_KEY no servidor.",
+            ]];
+        }
+
+        if ($codigo !== 200) {
+            return [502, [
+                "sucesso" => false,
+                "mensagem" => "A Brapi não conseguiu retornar a cotação desta criptomoeda.",
+                "codigo_http" => $codigo,
+            ]];
+        }
+
+        $dados = json_decode($corpo, true);
+        $coin = null;
+
+        foreach (($dados["coins"] ?? []) as $resultado) {
+            if (strtoupper((string) ($resultado["coin"] ?? "")) === $ticker) {
+                $coin = $resultado;
+                break;
+            }
+        }
+
+        $preco = $coin["regularMarketPrice"] ?? null;
+        $variacao = $coin["regularMarketChangePercent"] ?? null;
+
+        if (
+            !is_numeric($preco)
+            || !is_finite((float) $preco)
+            || (float) $preco <= 0
+        ) {
+            return [502, [
+                "sucesso" => false,
+                "mensagem" => "A Brapi não retornou uma cotação válida para esta criptomoeda.",
+            ]];
+        }
+
+        return [200, [
+            "sucesso" => true,
+            "ativo" => [
+                "ticker" => $ticker,
+                "nome" => $coin["coinName"] ?? $ticker,
+                "preco_atual" => (float) $preco,
+                "variacao_percentual" => is_numeric($variacao)
+                    && is_finite((float) $variacao)
+                    ? (float) $variacao
+                    : null,
+            ],
+        ]];
+    }
+
     /* Busca ativos pelo ticker ou nome (autocomplete). [status, corpo] */
-    public static function buscarAtivos(string $termo): array
+    public static function buscarAtivos(string $termo, ?string $categoria = null): array
     {
         $termo = trim($termo);
 
@@ -118,7 +411,46 @@ class CotacaoService
             return [200, ["sucesso" => true, "resultados" => []]];
         }
 
+        $categoriasPermitidas = ["Ações", "FIIs", "ETFs", "Criptomoedas"];
+        if ($categoria !== null && !in_array($categoria, $categoriasPermitidas, true)) {
+            return [400, ["sucesso" => false, "mensagem" => "Categoria de ativo inválida."]];
+        }
+
         $termo = strtoupper($termo);
+
+        if ($categoria === "ETFs") {
+            $dados = self::consultarJson(
+                self::URL_TICKERS
+                    . urlencode($termo)
+                    . "&subType=etf&limit=8"
+            );
+
+            if ($dados === null) {
+                return [502, [
+                    "sucesso" => false,
+                    "mensagem" => "Não foi possível buscar ETFs na Brapi.",
+                ]];
+            }
+
+            $resultados = [];
+            foreach (($dados["results"] ?? []) as $ativo) {
+                $ticker = strtoupper((string) ($ativo["symbol"] ?? ""));
+
+                if ($ticker === "" || ($ativo["subType"] ?? "") !== "etf") {
+                    continue;
+                }
+
+                $resultados[] = [
+                    "ticker" => $ticker,
+                    "nome" => $ativo["longName"]
+                        ?? $ativo["name"]
+                        ?? $ticker,
+                    "categoria" => "ETFs",
+                ];
+            }
+
+            return [200, ["sucesso" => true, "resultados" => $resultados]];
+        }
 
         [$corpo, $codigo] = self::http(self::URL_LISTA);
 
@@ -149,10 +481,15 @@ class CotacaoService
 
             /* Procura tanto pelo ticker quanto pelo nome. */
             if (stripos($ticker, $termo) !== false || stripos($nome, $termo) !== false) {
+                $categoriaAtivo = self::inferirCategoria($ticker, $nome);
+                if ($categoria !== null && $categoriaAtivo !== $categoria) {
+                    continue;
+                }
+
                 $resultados[] = [
                     "ticker" => $ticker,
                     "nome" => $nome,
-                    "categoria" => self::inferirCategoria($ticker, $nome),
+                    "categoria" => $categoriaAtivo,
                 ];
             }
 
@@ -166,6 +503,48 @@ class CotacaoService
     }
 
     /* ---------- internos ---------- */
+
+    private static function obterCotacaoFii(string $ticker): ?array
+    {
+        $dadosTicker = self::consultarJson(
+            self::URL_TICKERS
+                . urlencode($ticker)
+                . "&subType=fii&limit=10"
+        );
+
+        foreach (($dadosTicker["results"] ?? []) as $resultado) {
+            if (
+                strtoupper((string) ($resultado["symbol"] ?? "")) === $ticker
+                && ($resultado["subType"] ?? "") === "fii"
+            ) {
+                $quote = $resultado["quote"] ?? [];
+                $cotacao = $quote["lastPrice"] ?? null;
+
+                if (
+                    is_numeric($cotacao)
+                    && is_finite((float) $cotacao)
+                    && (float) $cotacao > 0
+                ) {
+                    $variacao = $quote["changePercent"] ?? null;
+
+                    return [
+                        "nome" => $resultado["longName"]
+                            ?? $resultado["name"]
+                            ?? $ticker,
+                        "preco_atual" => (float) $cotacao,
+                        "variacao_percentual" => is_numeric($variacao)
+                            && is_finite((float) $variacao)
+                            ? (float) $variacao
+                            : null,
+                    ];
+                }
+
+                return null;
+            }
+        }
+
+        return null;
+    }
 
     private static function inferirCategoria(string $ticker, string $nome): string
     {
@@ -240,13 +619,19 @@ class CotacaoService
     private static function http(string $url): array
     {
         $curl = curl_init();
+        $headers = ["Accept: application/json"];
+        $apiKey = getenv("BRAPI_API_KEY");
+
+        if (is_string($apiKey) && trim($apiKey) !== "") {
+            $headers[] = "Authorization: Bearer " . trim($apiKey);
+        }
 
         curl_setopt_array($curl, [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 10,
             CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_HTTPHEADER => ["Accept: application/json"],
+            CURLOPT_HTTPHEADER => $headers,
         ]);
 
         $corpo = curl_exec($curl);

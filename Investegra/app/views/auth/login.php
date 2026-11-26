@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - INVESTEGRA</title>
     <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="/css/tema.css?v=13">
+    <script src="/js/tema.js?v=2" defer></script>
 </head>
 <body>
-    <div class="container">
+    <div class="container auth-container">
         <div class="logo">
             <h1>INVESTEGRA</h1>
             <p>Plataforma de Gestão de Investimentos</p>

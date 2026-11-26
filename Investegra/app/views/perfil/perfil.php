@@ -48,7 +48,7 @@ $valorOuPadrao = static function ($value) use ($escape): string {
     <meta name="theme-color" content="#f5f7f4">
     <title>Meu perfil | Investegra</title>
     <link rel="stylesheet" href="css/perfil.css?v=6">
-    <link rel="stylesheet" href="css/nav-reveal.css?v=2">
+    <link rel="stylesheet" href="css/nav-reveal.css?v=3">
 </head>
 <body>
     <div class="layout">
@@ -63,7 +63,6 @@ $valorOuPadrao = static function ($value) use ($escape): string {
                 <a href="analises.php">Análises</a>
                 <a href="recomendacoes.php">Recomendações</a>
                 <a href="historico.php">Histórico</a>
-                <a href="alertas.php">Alertas</a>
             </nav>
             <a href="logout.php" class="logout">Sair</a>
         </aside>

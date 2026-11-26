@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - INVESTEGRA</title>
     <link rel="stylesheet" href="/css/cadastro.css">
+    <link rel="stylesheet" href="/css/tema.css?v=13">
+    <script src="/js/tema.js?v=2" defer></script>
 </head>
 <body>
-    <main class="container">
+    <main class="container auth-container">
         <header class="logo">
             <h1>INVESTEGRA</h1>
             <p>Plataforma de Gestão de Investimentos</p>

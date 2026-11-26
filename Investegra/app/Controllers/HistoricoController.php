@@ -29,7 +29,15 @@ class HistoricoController extends Controller
 
             $patrimonio_atual = $valores[count($valores) - 1];
             $maior_patrimonio = max($valores);
-            $menor_patrimonio = min($valores);
+            $patrimoniosPositivos = array_values(array_filter(
+                $valores,
+                function (float $valor): bool {
+                    return $valor > 0;
+                }
+            ));
+            $menor_patrimonio = !empty($patrimoniosPositivos)
+                ? min($patrimoniosPositivos)
+                : 0;
         }
 
         /* Variação total */

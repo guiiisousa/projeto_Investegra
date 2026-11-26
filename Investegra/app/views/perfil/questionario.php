@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz de investidor | Investegra</title>
     <link rel="stylesheet" href="css/questionario.css">
+    <link rel="stylesheet" href="css/tema.css?v=13">
+    <script src="js/tema.js?v=2" defer></script>
 </head>
 <body>
     <main class="quiz-container">

@@ -18,7 +18,7 @@
 
     <link
         rel="stylesheet"
-        href="css/dashboard.css"
+        href="css/dashboard.css?v=2"
     >
     <link
         rel="stylesheet"
@@ -198,9 +198,6 @@
 
 
 
-            <a href="alertas.php">
-                Alertas
-            </a>
 
         </nav>
 
@@ -222,25 +219,28 @@
     <main class="conteudo">
 
 
-        <header>
+        <header class="dashboard-header">
 
-            <h1>
+            <div>
+                <h1>
 
-                Olá,
-                <?= htmlspecialchars(
-                    $nome_usuario
-                ) ?>!
+                    Olá,
+                    <?= htmlspecialchars(
+                        $nome_usuario
+                    ) ?>!
 
-            </h1>
+                </h1>
 
 
-            <p>
+                <p>
 
-                Aqui está um resumo dos
-                seus investimentos.
+                    Aqui está um resumo dos
+                    seus investimentos.
 
-            </p>
+                </p>
+            </div>
 
+            <?php require BASE_PATH . "/app/views/partials/toggle_valores.php"; ?>
         </header>
 
 
@@ -258,7 +258,7 @@
                 </span>
 
 
-                <strong>
+                <strong data-sensitive-value>
 
                     R$
 
@@ -359,6 +359,7 @@
 
                         <canvas
                             id="graficoPatrimonio"
+                            data-sensitive-value
                         ></canvas>
 
                     </div>
@@ -379,6 +380,7 @@
                                         ? 'positivo-dashboard'
                                         : 'negativo-dashboard'
                                 ?>"
+                                data-sensitive-value
                             >
 
                                 <?= $variacao_ultimo >= 0
@@ -444,6 +446,7 @@
 
                         <canvas
                             id="graficoDistribuicao"
+                            data-sensitive-value
                         ></canvas>
 
                     </div>
@@ -471,7 +474,7 @@
                                 </span>
 
 
-                                <strong>
+                                <strong data-sensitive-value>
 
                                     <?= number_format(
                                         $categoria[
@@ -540,6 +543,7 @@
 
                     <canvas
                         id="graficoCarteiras"
+                        data-sensitive-value
                     ></canvas>
 
                 </div>
@@ -633,6 +637,7 @@
 
                     <strong
                         class="<?= $classe_diversificacao ?>"
+                        data-sensitive-value
                     >
 
                         <?= number_format(
@@ -728,7 +733,7 @@
                             </span>
 
 
-                            <strong>
+                            <strong data-sensitive-value>
 
                                 R$
 

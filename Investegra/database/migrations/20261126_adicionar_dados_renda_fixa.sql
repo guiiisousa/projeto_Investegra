@@ -1,0 +1,7 @@
+ALTER TABLE ativos
+    MODIFY COLUMN ticker VARCHAR(20) NOT NULL,
+    MODIFY COLUMN quantidade DECIMAL(18,8) NOT NULL,
+    ADD COLUMN renda_fixa_nome VARCHAR(100) DEFAULT NULL,
+    ADD COLUMN renda_fixa_indexador VARCHAR(20) DEFAULT NULL,
+    ADD COLUMN renda_fixa_taxa DECIMAL(8,4) DEFAULT NULL,
+    ADD COLUMN renda_fixa_vencimento DATE DEFAULT NULL;

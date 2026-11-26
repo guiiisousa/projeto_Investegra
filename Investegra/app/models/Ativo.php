@@ -6,11 +6,33 @@ use App\Core\Model;
 
 class Ativo extends Model
 {
+    public static function fiisByUser(int $usuarioId): array
+    {
+        return self::fetchAll(
+            "SELECT a.id, a.carteira_id, ca.nome AS carteira_nome,
+                    a.ticker, a.quantidade, a.preco_medio,
+                    cat.nome AS categoria
+             FROM ativos a
+             INNER JOIN carteiras ca ON a.carteira_id = ca.id
+             INNER JOIN categorias cat ON a.categoria_id = cat.id
+             WHERE ca.usuario_id = ?
+               AND (
+                    UPPER(TRIM(cat.nome)) LIKE 'FII%'
+                    OR UPPER(TRIM(cat.nome)) LIKE '%IMOBILI%'
+               )
+             ORDER BY ca.nome, a.ticker",
+            "i",
+            [$usuarioId]
+        );
+    }
+
     public static function allByUser(int $usuarioId): array
     {
         return self::fetchAll(
             "SELECT a.id, a.carteira_id, a.ticker, a.quantidade,
-                    a.preco_medio, a.data_compra, c.nome AS categoria
+                    a.preco_medio, a.data_compra, a.renda_fixa_nome,
+                    a.renda_fixa_indexador, a.renda_fixa_taxa,
+                    a.renda_fixa_vencimento, c.nome AS categoria
              FROM ativos a
              INNER JOIN carteiras ca ON a.carteira_id = ca.id
              LEFT JOIN categorias c ON a.categoria_id = c.id
@@ -25,7 +47,9 @@ class Ativo extends Model
     {
         return self::fetchAll(
             "SELECT a.id, a.ticker, a.quantidade, a.preco_medio,
-                    a.data_compra, a.observacao, c.nome AS categoria
+                    a.data_compra, a.observacao, a.renda_fixa_nome,
+                    a.renda_fixa_indexador, a.renda_fixa_taxa,
+                    a.renda_fixa_vencimento, c.nome AS categoria
              FROM ativos a
              LEFT JOIN categorias c ON a.categoria_id = c.id
              WHERE a.carteira_id = ?
@@ -41,7 +65,9 @@ class Ativo extends Model
         return self::fetchOne(
             "SELECT a.id, a.carteira_id, a.categoria_id, a.ticker,
                     a.quantidade, a.preco_medio, a.data_compra,
-                    a.observacao, c.nome AS carteira_nome
+                    a.observacao, a.renda_fixa_nome, a.renda_fixa_indexador,
+                    a.renda_fixa_taxa, a.renda_fixa_vencimento,
+                    c.nome AS carteira_nome
              FROM ativos a
              INNER JOIN carteiras c ON a.carteira_id = c.id
              WHERE a.id = ? AND c.usuario_id = ?",
@@ -55,13 +81,16 @@ class Ativo extends Model
         return self::execute(
             "INSERT INTO ativos
                 (carteira_id, categoria_id, ticker, quantidade,
-                 preco_medio, data_compra, observacao)
-             VALUES (?, ?, ?, ?, ?, ?, ?)",
-            "iisidss",
+                 preco_medio, data_compra, observacao, renda_fixa_nome,
+                 renda_fixa_indexador, renda_fixa_taxa, renda_fixa_vencimento)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "iisddssssds",
             [
                 $d["carteira_id"], $d["categoria_id"], $d["ticker"],
                 $d["quantidade"], $d["preco_medio"],
-                $d["data_compra"], $d["observacao"],
+                $d["data_compra"], $d["observacao"], $d["renda_fixa_nome"],
+                $d["renda_fixa_indexador"], $d["renda_fixa_taxa"],
+                $d["renda_fixa_vencimento"],
             ]
         );
     }
@@ -71,12 +100,16 @@ class Ativo extends Model
         return self::execute(
             "UPDATE ativos
              SET ticker = ?, categoria_id = ?, quantidade = ?,
-                 preco_medio = ?, data_compra = ?, observacao = ?
+                 preco_medio = ?, data_compra = ?, observacao = ?,
+                 renda_fixa_nome = ?, renda_fixa_indexador = ?,
+                 renda_fixa_taxa = ?, renda_fixa_vencimento = ?
              WHERE id = ?",
-            "siidssi",
+            "siddssssdsi",
             [
                 $d["ticker"], $d["categoria_id"], $d["quantidade"],
-                $d["preco_medio"], $d["data_compra"], $d["observacao"], $id,
+                $d["preco_medio"], $d["data_compra"], $d["observacao"],
+                $d["renda_fixa_nome"], $d["renda_fixa_indexador"],
+                $d["renda_fixa_taxa"], $d["renda_fixa_vencimento"], $id,
             ]
         );
     }
@@ -92,6 +125,10 @@ class Ativo extends Model
     public static function comCotacao(array $ativo, array $cotacoes): array
     {
         $ticker = strtoupper(trim($ativo["ticker"]));
+        $ehRendaFixa = strcasecmp(
+            trim((string) ($ativo["categoria"] ?? "")),
+            "Renda Fixa"
+        ) === 0;
 
         $quantidade = (float) $ativo["quantidade"];
         $precoMedio = (float) $ativo["preco_medio"];
@@ -101,17 +138,24 @@ class Ativo extends Model
         $ativo["preco_medio"] = $precoMedio;
         $ativo["valor_investido"] = $quantidade * $precoMedio;
 
-        $cotacao = $cotacoes[$ticker] ?? null;
+        $cotacao = $ehRendaFixa ? null : ($cotacoes[$ticker] ?? null);
 
         $ativo["cotacao"] = $cotacao;
         $ativo["preco_atual"] = null;
-        $ativo["valor_atual"] = null;
-        $ativo["resultado"] = null;
+        $ativo["valor_atual"] = $ativo["valor_investido"];
+        $ativo["resultado"] = 0.0;
         $ativo["variacao_percentual"] = null;
 
-        if ($cotacao !== null && isset($cotacao["preco_atual"])) {
-
-            $precoAtual = (float) $cotacao["preco_atual"];
+        $precoCotado = is_array($cotacao)
+            ? ($cotacao["preco_atual"] ?? null)
+            : null;
+        if (
+            !$ehRendaFixa
+            && is_numeric($precoCotado)
+            && is_finite((float) $precoCotado)
+            && (float) $precoCotado > 0
+        ) {
+            $precoAtual = (float) $precoCotado;
             $valorAtual = $quantidade * $precoAtual;
 
             $ativo["preco_atual"] = $precoAtual;
@@ -151,7 +195,7 @@ class Ativo extends Model
             "totalResultado" => $totalResultado,
             "rentabilidade" => $totalInvestido > 0
                 ? ($totalResultado / $totalInvestido) * 100
-                : null,
+                : 0.0,
         ];
     }
 

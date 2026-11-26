@@ -19,4 +19,15 @@ class Categoria extends Model
             [$id]
         ) !== null;
     }
+
+    public static function nomePorId(int $id): ?string
+    {
+        $categoria = self::fetchOne(
+            "SELECT nome FROM categorias WHERE id = ?",
+            "i",
+            [$id]
+        );
+
+        return $categoria["nome"] ?? null;
+    }
 }

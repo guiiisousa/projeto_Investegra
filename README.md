@@ -53,6 +53,24 @@ O projeto foi desenvolvido utilizando:
 * **Chart.js**
 * **Docker**
 
+## Dados de mercado e renda fixa
+
+Ativos de mercado exibem a cotação e a variação diária consultadas na Brapi. ETFs são localizados
+e cotados pelo endpoint de tickers da API. A cotação de criptomoedas exige `BRAPI_API_KEY` no
+ambiente do servidor. Os FIIs usam a cotação pública da Brapi; para obter indicadores de qualquer
+FII na simulação de bola de neve, é necessário acesso ao plano Pro. Sem a chave, a Brapi limita
+esses indicadores a MXRF11 e HGLG11.
+
+O cadastro de renda fixa é manual e registra produto/emissor, valor aplicado, indexador, taxa e
+vencimento. Aportes e resgates atualizam o valor aplicado e são registrados no histórico. A Brapi
+não fornece cotação de mercado para esses títulos através do fluxo de ações.
+
+Informe manualmente a quantidade de cotas dos ativos de mercado.
+Em bancos já existentes, inclusive volumes Docker já criados, execute
+`Investegra/database/migrations/20261126_adicionar_dados_renda_fixa.sql` no banco atual pelo
+phpMyAdmin ou por um cliente MySQL. O arquivo `Investegra/database/Investegra.sql` é executado
+automaticamente apenas quando o volume do MySQL é criado pela primeira vez.
+
 ## 📊 Modelagem do sistema
 
 Para auxiliar no planejamento e desenvolvimento do projeto, foram elaborados diagramas que representam diferentes aspectos do funcionamento do INVESTEGRA, como o **Diagrama de Classes**, **Diagrama de Sequência** e o **Diagrama de casos de uso**.

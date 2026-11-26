@@ -65,12 +65,6 @@
             </a>
 
 
-            <a 
-                href="alertas.php"
-                class="alertas"
-            >
-                Alertas
-            </a>
 
         </nav>
 

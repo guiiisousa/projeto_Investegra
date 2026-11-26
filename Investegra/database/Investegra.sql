@@ -47,11 +47,15 @@ CREATE TABLE `ativos` (
   `id` int NOT NULL,
   `carteira_id` int NOT NULL,
   `categoria_id` int DEFAULT NULL,
-  `ticker` varchar(10) NOT NULL,
+  `ticker` varchar(20) NOT NULL,
   `quantidade` decimal(18,8) NOT NULL,
   `preco_medio` decimal(10,2) NOT NULL,
   `data_compra` date DEFAULT NULL,
-  `observacao` text
+  `observacao` text,
+  `renda_fixa_nome` varchar(100) DEFAULT NULL,
+  `renda_fixa_indexador` varchar(20) DEFAULT NULL,
+  `renda_fixa_taxa` decimal(8,4) DEFAULT NULL,
+  `renda_fixa_vencimento` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -150,7 +154,7 @@ CREATE TABLE `simulacoes` (
   `aporte_inicial` decimal(15,2) NOT NULL,
   `aporte_mensal` decimal(15,2) NOT NULL,
   `rentabilidade` decimal(10,2) NOT NULL,
-  `prazo_anos` int NOT NULL,
+  `prazo_anos` decimal(9,6) NOT NULL,
   `montante` decimal(15,2) NOT NULL,
   `criado_em` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

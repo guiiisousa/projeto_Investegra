@@ -67,9 +67,6 @@
                 Recomendações
             </a>
 
-            <a href="alertas.php">
-                Alertas
-            </a>
 
             <a href="logout.php">
                 Sair
@@ -572,20 +569,22 @@
 
                                 <?php
 
-                                echo $simulacao[
-                                    "prazo_anos"
-                                ];
+                                $prazoMeses = (int) round(
+                                (float) $simulacao["prazo_anos"] * 12
+                                );
+                                $prazoAnos = intdiv($prazoMeses, 12);
+                                $mesesRestantes = $prazoMeses % 12;
 
-                                ?>
+                                if ($prazoAnos > 0) {
+                                echo $prazoAnos
+                                    . ($prazoAnos === 1 ? " ano" : " anos");
+                                }
 
-                                <?php
-
-                                echo
-                                    $simulacao[
-                                        "prazo_anos"
-                                    ] == 1
-                                    ? " ano"
-                                    : " anos";
+                                if ($mesesRestantes > 0) {
+                                echo ($prazoAnos > 0 ? " e " : "")
+                                    . $mesesRestantes
+                                    . ($mesesRestantes === 1 ? " mês" : " meses");
+                                }
 
                                 ?>
 

@@ -47,6 +47,7 @@ $router->add("historico", "HistoricoController", "index");
 /* Simulações */
 $router->add("simulacao", "SimulacaoController", "index");
 $router->add("processar_simulacao", "SimulacaoController", "processar");
+$router->add("processar_bola_neve", "SimulacaoController", "processarBolaNeve");
 $router->add("historico_simulacoes", "SimulacaoController", "historico");
 
 /* Alertas e recomendações */
@@ -63,6 +64,10 @@ $router->add("meu_perfil", "PerfilController", "perfil");
 /* API (JSON) */
 $router->add("api/chat", "ApiController", "chat");
 $router->add("api/cotacao", "ApiController", "cotacao");
+$router->add("api/cotacao_fii", "ApiController", "cotacaoFii");
+$router->add("api/cotacao_etf", "ApiController", "cotacaoEtf");
+$router->add("api/cotacao_cripto", "ApiController", "cotacaoCripto");
+$router->add("api/dados_fii", "ApiController", "dadosFii");
 $router->add("api/buscar_ativos", "ApiController", "buscarAtivos");
 
 /* Assistente de IA */

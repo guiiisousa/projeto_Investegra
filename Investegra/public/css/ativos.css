@@ -430,6 +430,10 @@ tbody tr:hover {
         );
 }
 
+.formulario-container [hidden] {
+    display: none !important;
+}
+
 .formulario-container h1 {
     margin-top: 15px;
 
@@ -726,6 +730,10 @@ textarea:focus {
     display: block;
 }
 
+.ativo-selecionado.erro {
+    color: #b42318;
+}
+
 /* =========================================================
    RESUMO DA CARTEIRA
    ========================================================= */
@@ -826,6 +834,10 @@ textarea:focus {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 15px;
+}
+
+.informacoes-ativo.renda-fixa {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .informacao {
@@ -979,6 +991,32 @@ textarea:focus {
     margin: 4px 0 10px;
     color: #75807c;
     font-size: 12px;
+}
+
+:root[data-theme="dark"] .form-movimentacao,
+:root[data-theme="dark"] .data-compra,
+:root[data-theme="dark"] .observacao {
+    border-color: #354038 !important;
+    background: #26332b !important;
+    color: #edf4f0 !important;
+}
+
+:root[data-theme="dark"] .form-movimentacao label,
+:root[data-theme="dark"] .saldo-disponivel,
+:root[data-theme="dark"] .data-compra {
+    color: #aebbb4 !important;
+}
+
+:root[data-theme="dark"] .btn-comprar {
+    border-color: #245a45 !important;
+    background: #173d2e !important;
+    color: #6ee7b7 !important;
+}
+
+:root[data-theme="dark"] .btn-vender {
+    border-color: #663939 !important;
+    background: #3d2424 !important;
+    color: #ffb4b4 !important;
 }
 
 .btn-confirmar-compra,
@@ -1293,6 +1331,10 @@ textarea:focus {
     }
 
     .informacoes-ativo {
+        grid-template-columns: 1fr;
+    }
+
+    .informacoes-ativo.renda-fixa {
         grid-template-columns: 1fr;
     }
 

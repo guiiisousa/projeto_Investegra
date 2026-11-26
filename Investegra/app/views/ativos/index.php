@@ -16,7 +16,7 @@
 
     <link
         rel="stylesheet"
-        href="css/ativos.css?v=5"
+        href="css/ativos.css?v=7"
     >
     <link
         rel="stylesheet"
@@ -44,7 +44,6 @@
         <a href="analises.php">Análises</a>
         <a href="recomendacoes.php">Recomendações</a>
         <a href="historico.php">Histórico</a>
-        <a href="alertas.php">Alertas</a>
     </nav>
 
     <a href="logout.php" class="logout">Sair</a>
@@ -135,19 +134,9 @@
                 Valor atual
             </span>
 
-            <?php if ($totalAtual > 0): ?>
-
-                <strong>
-                    <?= formatarMoeda($totalAtual) ?>
-                </strong>
-
-            <?php else: ?>
-
-                <strong>
-                    —
-                </strong>
-
-            <?php endif; ?>
+            <strong>
+                <?= formatarMoeda($totalAtual) ?>
+            </strong>
 
         </div>
 
@@ -158,25 +147,10 @@
                 Resultado
             </span>
 
-            <?php if ($totalInvestido > 0 && $totalAtual > 0): ?>
-
-                <strong
-                    class="<?= classeResultado($totalResultado) ?>"
-                >
-
-                    <?= sinalResultado($totalResultado) ?>
-
-                    <?= formatarMoeda($totalResultado) ?>
-
-                </strong>
-
-            <?php else: ?>
-
-                <strong>
-                    —
-                </strong>
-
-            <?php endif; ?>
+            <strong class="<?= classeResultado($totalResultado) ?>">
+                <?= sinalResultado($totalResultado) ?>
+                <?= formatarMoeda($totalResultado) ?>
+            </strong>
 
         </div>
 
@@ -187,30 +161,10 @@
                 Rentabilidade
             </span>
 
-            <?php if ($rentabilidade !== null): ?>
-
-                <strong
-                    class="<?= classeResultado($rentabilidade) ?>"
-                >
-
-                    <?= sinalResultado($rentabilidade) ?>
-
-                    <?= number_format(
-                        $rentabilidade,
-                        2,
-                        ",",
-                        "."
-                    ) ?>%
-
-                </strong>
-
-            <?php else: ?>
-
-                <strong>
-                    —
-                </strong>
-
-            <?php endif; ?>
+            <strong class="<?= classeResultado($rentabilidade ?? 0) ?>">
+                <?= sinalResultado($rentabilidade ?? 0) ?>
+                <?= number_format($rentabilidade ?? 0, 2, ",", ".") ?>%
+            </strong>
 
         </div>
 
@@ -298,9 +252,20 @@
 
                 <?php
 
-                $ticker = strtoupper(
-                    trim($ativo["ticker"])
+                $ehRendaFixa = ($ativo["categoria"] ?? "") === "Renda Fixa";
+                $ehCripto = ($ativo["categoria"] ?? "") === "Criptomoedas";
+                $ticker = strtoupper(trim($ativo["ticker"]));
+                $passoQuantidade = $ehCripto ? "0.00000001" : "1";
+                $minimoQuantidade = $ehCripto ? "0.00000001" : "1";
+                $quantidadeDisponivel = number_format(
+                    (float) $ativo["quantidade"],
+                    8,
+                    ".",
+                    ""
                 );
+                $nomeExibicao = $ehRendaFixa
+                    ? ($ativo["renda_fixa_nome"] ?: $ticker)
+                    : $ticker;
 
                 $cotacao = $ativo["cotacao"];
 
@@ -308,6 +273,10 @@
 
                 $valorInvestido =
                     $ativo["valor_investido"];
+
+                $precoMovimentacao = $precoAtual !== null
+                    ? (float) $precoAtual
+                    : (float) $ativo["preco_medio"];
 
                 $valorAtual =
                     $ativo["valor_atual"];
@@ -333,10 +302,14 @@
                         <div>
 
                             <span class="ticker">
-                                <?= htmlspecialchars($ticker) ?>
+                                <?= htmlspecialchars($nomeExibicao) ?>
                             </span>
 
-                            <?php if (!empty($cotacao["nome"])): ?>
+                            <?php if ($ehRendaFixa): ?>
+                                <span class="nome-ativo">
+                                    <?= htmlspecialchars($ticker) ?>
+                                </span>
+                            <?php elseif (!empty($cotacao["nome"])): ?>
 
                                 <span class="nome-ativo">
 
@@ -370,30 +343,23 @@
                          INFORMAÇÕES
                          ================================================= -->
 
-                    <div class="informacoes-ativo">
+                    <div class="informacoes-ativo<?= $ehRendaFixa ? " renda-fixa" : "" ?>">
+
+
+                        <?php if (!$ehRendaFixa): ?>
+                            <div class="informacao">
+                                <span>Quantidade</span>
+                                <strong>
+                                    <?= formatarQuantidade($ativo["quantidade"]) ?>
+                                </strong>
+                            </div>
+                        <?php endif; ?>
 
 
                         <div class="informacao">
 
                             <span>
-                                Quantidade
-                            </span>
-
-                            <strong>
-
-                                <?= formatarQuantidade(
-                                    $ativo["quantidade"]
-                                ) ?>
-
-                            </strong>
-
-                        </div>
-
-
-                        <div class="informacao">
-
-                            <span>
-                                Preço de compra
+                                <?= $ehRendaFixa ? "Valor aplicado" : "Preço médio" ?>
                             </span>
 
                             <strong>
@@ -407,104 +373,48 @@
                         </div>
 
 
-                        <div class="informacao destaque">
+                        <?php if (!$ehRendaFixa): ?>
+                            <div class="informacao destaque">
+                                <span>Cotação atual</span>
+                                <?php if ($precoAtual !== null): ?>
+                                    <strong><?= formatarMoeda($precoAtual) ?></strong>
+                                <?php else: ?>
+                                    <strong class="indisponivel">Indisponível</strong>
+                                <?php endif; ?>
+                            </div>
 
-                            <span>
-                                Cotação atual
-                            </span>
-
-                            <?php if ($precoAtual !== null): ?>
-
-                                <strong>
-
-                                    <?= formatarMoeda(
-                                        $precoAtual
-                                    ) ?>
-
-                                </strong>
-
-                            <?php else: ?>
-
-                                <strong class="indisponivel">
-                                    Indisponível
-                                </strong>
-
-                            <?php endif; ?>
-
-                        </div>
-
-
-                        <div class="informacao">
-
-                            <span>
-                                Valor investido
-                            </span>
-
-                            <strong>
-
-                                <?= formatarMoeda(
-                                    $valorInvestido
-                                ) ?>
-
-                            </strong>
-
-                        </div>
+                            <div class="informacao">
+                                <span>Valor investido</span>
+                                <strong><?= formatarMoeda($valorInvestido) ?></strong>
+                            </div>
+                        <?php endif; ?>
 
 
                         <div class="informacao destaque">
 
                             <span>
-                                Valor atual
+                                <?= $ehRendaFixa
+                                    ? "Saldo atual"
+                                    : ($precoAtual === null
+                                        ? "Valor estimado pelo preço médio"
+                                        : "Valor atual") ?>
                             </span>
-
-                            <?php if ($valorAtual !== null): ?>
-
-                                <strong>
-
-                                    <?= formatarMoeda(
-                                        $valorAtual
-                                    ) ?>
-
-                                </strong>
-
-                            <?php else: ?>
-
-                                <strong class="indisponivel">
-                                    Indisponível
-                                </strong>
-
-                            <?php endif; ?>
+                            <strong><?= formatarMoeda($valorAtual) ?></strong>
 
                         </div>
 
 
+                        <?php if (!$ehRendaFixa): ?>
                         <div class="informacao">
 
                             <span>
                                 Resultado
                             </span>
 
-                            <?php if ($resultado !== null): ?>
-
-                                <strong
-                                    class="<?= classeResultado($resultado) ?>"
-                                >
-
-                                    <?= sinalResultado($resultado) ?>
-
-                                    <?= formatarMoeda(
-                                        $resultado
-                                    ) ?>
-
-                                </strong>
-
-                            <?php else: ?>
-
-                                <strong class="indisponivel">
-                                    —
-                                </strong>
-
-                            <?php endif; ?>
+                            <strong class="<?= classeResultado($resultado) ?>">
+                                <?= sinalResultado($resultado) ?>
+                                <?= formatarMoeda($resultado) ?>
+                            </strong>
 
                         </div>
 
@@ -516,36 +426,34 @@
                             </span>
 
                             <?php if ($variacaoPercentual !== null): ?>
-
-                                <strong
-                                    class="<?= classeResultado($variacaoPercentual) ?>"
-                                >
-
-                                    <?= sinalResultado(
-                                        $variacaoPercentual
-                                    ) ?>
-
-                                    <?= number_format(
-                                        $variacaoPercentual,
-                                        2,
-                                        ",",
-                                        "."
-                                    ) ?>%
-
+                                <strong class="<?= classeResultado($variacaoPercentual) ?>">
+                                    <?= sinalResultado($variacaoPercentual) ?>
+                                    <?= number_format($variacaoPercentual, 2, ",", ".") ?>%
                                 </strong>
-
                             <?php else: ?>
-
-                                <strong class="indisponivel">
-                                    —
-                                </strong>
-
+                                <strong class="indisponivel">Indisponível</strong>
                             <?php endif; ?>
 
                         </div>
+                        <?php endif; ?>
 
 
                     </div>
+
+                    <?php if ($ehRendaFixa): ?>
+                        <div class="observacao">
+                            <strong>Indexador:</strong>
+                            <?= htmlspecialchars($ativo["renda_fixa_indexador"] ?? "") ?>
+                            <span> · </span>
+                            <strong>Taxa:</strong>
+                            <?= number_format((float) $ativo["renda_fixa_taxa"], 2, ",", ".") ?>%
+                            <?php if (!empty($ativo["renda_fixa_vencimento"])): ?>
+                                <span> · </span>
+                                <strong>Vencimento:</strong>
+                                <?= date("d/m/Y", strtotime($ativo["renda_fixa_vencimento"])) ?>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
 
 
                     <!-- =================================================
@@ -556,7 +464,7 @@
 
                         <div class="data-compra">
 
-                            Compra realizada em:
+                            <?= $ehRendaFixa ? "Aplicação realizada em:" : "Compra realizada em:" ?>
 
                             <?= date(
                                 "d/m/Y",
@@ -596,41 +504,76 @@
                          ================================================= -->
 
                     <div class="acoes-ativo">
-                        <details class="movimentacao-ativo movimentacao-compra">
+                        <details
+                            class="movimentacao-ativo movimentacao-compra"
+                            name="movimentacao-<?= (int) $ativo["id"] ?>"
+                        >
                             <summary class="btn-comprar">Compra</summary>
                             <form action="comprar_ativo.php" method="POST" class="form-movimentacao">
                                 <input type="hidden" name="id" value="<?= (int) $ativo["id"] ?>">
+                                <?php if ($ehRendaFixa): ?>
+                                    <label>
+                                        Valor a adicionar (R$)
+                                        <input type="number" name="preco_medio" min="0.01" step="0.01" required>
+                                    </label>
+                                    <label>
+                                        Data do aporte
+                                        <input type="date" name="data_compra" value="<?= date('Y-m-d') ?>" required>
+                                    </label>
+                                <?php else: ?>
                                 <label>
                                     Quantidade
-                                    <input type="number" name="quantidade" min="1" step="1" required>
+                                    <input type="number" name="quantidade" min="<?= $minimoQuantidade ?>" step="<?= $passoQuantidade ?>" required>
                                 </label>
                                 <label>
                                     Preço de compra
-                                    <input type="number" name="preco_medio" min="0" step="0.01" value="<?= htmlspecialchars(number_format((float) $ativo["preco_medio"], 2, ".", "")) ?>" required>
+                                    <input type="number" name="preco_medio" min="0.01" step="0.01" value="<?= htmlspecialchars(number_format($precoMovimentacao, 2, ".", "")) ?>" required>
                                 </label>
                                 <label>
                                     Data da compra
-                                    <input type="date" name="data_compra" value="<?= date('Y-m-d') ?>">
+                                    <input type="date" name="data_compra" value="<?= date('Y-m-d') ?>" required>
                                 </label>
+                                <?php endif; ?>
                                 <button type="submit" class="btn-confirmar-compra">Confirmar compra</button>
                             </form>
                         </details>
 
-                        <details class="movimentacao-ativo movimentacao-venda">
+                        <details
+                            class="movimentacao-ativo movimentacao-venda"
+                            name="movimentacao-<?= (int) $ativo["id"] ?>"
+                        >
                             <summary class="btn-vender">Venda</summary>
-                            <form action="vender_ativo.php" method="POST" class="form-movimentacao" onsubmit="return confirm('Confirmar a venda desta quantidade?');">
+                            <form action="vender_ativo.php" method="POST" class="form-movimentacao" onsubmit="return confirm('<?= $ehRendaFixa ? "Confirmar este resgate?" : "Confirmar a venda desta quantidade?" ?>');">
                                 <input type="hidden" name="id" value="<?= (int) $ativo["id"] ?>">
+                                <?php if ($ehRendaFixa): ?>
+                                    <label>
+                                        Valor a retirar (R$)
+                                        <input type="number" name="preco_medio" min="0.01" max="<?= number_format($valorInvestido, 2, ".", "") ?>" step="0.01" required>
+                                    </label>
+                                    <label>
+                                        Data do resgate
+                                        <input type="date" name="data_venda" value="<?= date('Y-m-d') ?>" required>
+                                    </label>
+                                    <div class="saldo-disponivel">
+                                        Disponível: <strong><?= formatarMoeda($valorInvestido) ?></strong>
+                                    </div>
+                                <?php else: ?>
                                 <label>
                                     Quantidade
-                                    <input type="number" name="quantidade" min="1" max="<?= (int) $ativo["quantidade"] ?>" step="1" required>
+                                    <input type="number" name="quantidade" min="<?= $minimoQuantidade ?>" max="<?= $quantidadeDisponivel ?>" step="<?= $passoQuantidade ?>" required>
                                 </label>
                                 <label>
                                     Preço de venda
-                                    <input type="number" name="preco_medio" min="0" step="0.01" placeholder="Opcional">
+                                    <input type="number" name="preco_medio" min="0.01" step="0.01" value="<?= htmlspecialchars(number_format($precoMovimentacao, 2, ".", "")) ?>" required>
+                                </label>
+                                <label>
+                                    Data da venda
+                                    <input type="date" name="data_venda" value="<?= date('Y-m-d') ?>" required>
                                 </label>
                                 <div class="saldo-disponivel">
-                                    Disponível: <strong><?= (int) $ativo["quantidade"] ?></strong>
+                                    Disponível: <strong><?= formatarQuantidade($ativo["quantidade"]) ?></strong>
                                 </div>
+                                <?php endif; ?>
                                 <button type="submit" class="btn-confirmar-venda">Confirmar venda</button>
                             </form>
                         </details>
@@ -689,6 +632,10 @@
                                     "preco_medio" => "Preço de compra",
                                     "data_compra" => "Data da compra",
                                     "observacao" => "Observação",
+                                    "renda_fixa_nome" => "Produto / emissor",
+                                    "renda_fixa_indexador" => "Indexador",
+                                    "renda_fixa_taxa" => "Taxa contratada",
+                                    "renda_fixa_vencimento" => "Vencimento",
                                 ];
                                 $acaoExibida = $registro["entidade"] === "Ativo"
                                     ? ($registro["acao"] === "criou"

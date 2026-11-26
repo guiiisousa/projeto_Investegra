@@ -29,13 +29,15 @@
     </a>
 
     <nav>
-        <?php require BASE_PATH . "/app/views/partials/perfil_nav.php"; ?>
+        <?php
+            $alertasNavAtivo = true;
+            require BASE_PATH . "/app/views/partials/perfil_nav.php";
+        ?>
         <a href="carteiras.php">Carteiras</a>
         <a href="simulacao.php">Simulações</a>
         <a href="analises.php">Análises</a>
         <a href="recomendacoes.php">Recomendações</a>
         <a href="historico.php">Histórico</a>
-        <a href="alertas.php" class="ativo">Alertas</a>
     </nav>
 
 </aside>

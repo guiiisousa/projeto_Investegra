@@ -26,7 +26,7 @@ class Simulacao extends Model
         float $aporteInicial,
         float $aporteMensal,
         float $rentabilidade,
-        int $prazoAnos,
+        float $prazoAnos,
         float $montante
     ): ?int {
         $ok = self::execute(
@@ -34,7 +34,7 @@ class Simulacao extends Model
                 (usuario_id, tipo_juros, aporte_inicial, aporte_mensal,
                  rentabilidade, prazo_anos, montante)
              VALUES (?, ?, ?, ?, ?, ?, ?)",
-            "isdddid",
+            "isddddd",
             [
                 $usuarioId, $tipoJuros, $aporteInicial, $aporteMensal,
                 $rentabilidade, $prazoAnos, $montante,

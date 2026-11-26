@@ -303,9 +303,6 @@
             >
                 Histórico
             </a>
-            <a href="alertas.php">
-                Alertas
-            </a>
         </nav>
 
 

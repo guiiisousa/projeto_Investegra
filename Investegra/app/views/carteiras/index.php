@@ -17,7 +17,7 @@
 
     <link
         rel="stylesheet"
-        href="css/carteiras.css?v=2"
+        href="css/carteiras.css?v=4"
     >
     <link
         rel="stylesheet"
@@ -43,7 +43,6 @@
         <a href="analises.php">Análises</a>
         <a href="recomendacoes.php">Recomendações</a>
         <a href="historico.php">Histórico</a>
-        <a href="alertas.php">Alertas</a>
     </nav>
 
     <a href="logout.php" class="logout">Sair</a>
@@ -72,14 +71,17 @@
         </div>
 
 
-        <?php if (!empty($carteiras)): ?>
-            <a
-                href="nova_carteira.php"
-                class="btn-principal"
-            >
-                + Nova carteira
-            </a>
-        <?php endif; ?>
+        <div class="topo-acoes">
+            <?php require BASE_PATH . "/app/views/partials/toggle_valores.php"; ?>
+            <?php if (!empty($carteiras)): ?>
+                <a
+                    href="nova_carteira.php"
+                    class="btn-principal"
+                >
+                    + Nova carteira
+                </a>
+            <?php endif; ?>
+        </div>
 
     </div>
 
@@ -132,8 +134,8 @@
                 $totalAtivos =
                     $carteira["total_ativos"];
 
-                $cotacoesDisponiveis =
-                    $carteira["cotacoes_disponiveis"];
+                $ativosSemCotacao =
+                    $carteira["ativos_sem_cotacao"];
 
 
                 /*
@@ -142,24 +144,9 @@
                 |--------------------------------------------------------------------------
                 */
 
-                $rentabilidade = null;
-
-                if ($totalInvestido > 0) {
-
-                    /*
-                     * Só calculamos se houver pelo menos
-                     * uma cotação disponível.
-                     */
-
-                    if ($cotacoesDisponiveis > 0) {
-
-                        $rentabilidade =
-                            (
-                                $resultado
-                                / $totalInvestido
-                            ) * 100;
-                    }
-                }
+                $rentabilidade = $totalInvestido > 0
+                    ? ($resultado / $totalInvestido) * 100
+                    : 0;
 
                 ?>
 
@@ -248,7 +235,7 @@
                                 Total investido
                             </span>
 
-                            <strong>
+                            <strong data-sensitive-value>
                                 <?= formatarMoeda(
                                     $totalInvestido
                                 ) ?>
@@ -263,21 +250,9 @@
                                 Valor atual
                             </span>
 
-                            <?php if ($cotacoesDisponiveis > 0): ?>
-
-                                <strong>
-                                    <?= formatarMoeda(
-                                        $totalAtual
-                                    ) ?>
-                                </strong>
-
-                            <?php else: ?>
-
-                                <strong class="indisponivel">
-                                    Indisponível
-                                </strong>
-
-                            <?php endif; ?>
+                            <strong data-sensitive-value>
+                                <?= formatarMoeda($totalAtual) ?>
+                            </strong>
 
                         </div>
 
@@ -288,29 +263,13 @@
                                 Resultado
                             </span>
 
-                            <?php if ($cotacoesDisponiveis > 0): ?>
-
-                                <strong
-                                    class="<?= classeResultado($resultado) ?>"
-                                >
-
-                                    <?= sinalResultado(
-                                        $resultado
-                                    ) ?>
-
-                                    <?= formatarMoeda(
-                                        $resultado
-                                    ) ?>
-
-                                </strong>
-
-                            <?php else: ?>
-
-                                <strong class="indisponivel">
-                                    —
-                                </strong>
-
-                            <?php endif; ?>
+                            <strong
+                                class="<?= classeResultado($resultado) ?>"
+                                data-sensitive-value
+                            >
+                                <?= sinalResultado($resultado) ?>
+                                <?= formatarMoeda($resultado) ?>
+                            </strong>
 
                         </div>
 
@@ -321,29 +280,13 @@
                                 Rentabilidade
                             </span>
 
-                            <?php if ($rentabilidade !== null): ?>
-
-                                <strong
-                                    class="<?= classeResultado($rentabilidade) ?>"
-                                >
-
-                                    <?= sinalResultado(
-                                        $rentabilidade
-                                    ) ?>
-
-                                    <?= formatarPercentual(
-                                        $rentabilidade
-                                    ) ?>
-
-                                </strong>
-
-                            <?php else: ?>
-
-                                <strong class="indisponivel">
-                                    —
-                                </strong>
-
-                            <?php endif; ?>
+                            <strong
+                                class="<?= classeResultado($rentabilidade) ?>"
+                                data-sensitive-value
+                            >
+                                <?= sinalResultado($rentabilidade) ?>
+                                <?= formatarPercentual($rentabilidade) ?>
+                            </strong>
 
                         </div>
 
@@ -371,8 +314,14 @@
                                     as $ativo
                                 ): ?>
 
+                                    <?php
+                                        $ehRendaFixaAtivo = strcasecmp(
+                                            trim((string) ($ativo["categoria"] ?? "")),
+                                            "Renda Fixa"
+                                        ) === 0;
+                                    ?>
 
-                                    <div class="linha-ativo">
+                                    <div class="linha-ativo<?= $ehRendaFixaAtivo ? " renda-fixa" : "" ?>">
 
 
                                         <div class="ativo-identificacao">
@@ -404,101 +353,49 @@
                                         </div>
 
 
-                                        <div class="ativo-dado">
-
-                                            <span>
-                                                Quantidade
-                                            </span>
-
-                                            <strong>
-
-                                                <?= number_format(
-                                                    (int) $ativo["quantidade"],
-                                                    0,
-                                                    "",
-                                                    "."
-                                                ) ?>
-
-                                            </strong>
-
-                                        </div>
-
-
-                                        <div class="ativo-dado">
-
-                                            <span>
-                                                Preço de compra
-                                            </span>
-
-                                            <strong>
-
-                                                <?= formatarMoeda(
-                                                    $ativo["preco_medio"]
-                                                ) ?>
-
-                                            </strong>
-
-                                        </div>
-
-
-                                        <div class="ativo-dado">
-
-                                            <span>
-                                                Cotação
-                                            </span>
-
-                                            <?php if (
-                                                $ativo["preco_atual"]
-                                                !== null
-                                            ): ?>
-
-                                                <strong>
-
-                                                    <?= formatarMoeda(
-                                                        $ativo["preco_atual"]
-                                                    ) ?>
-
+                                        <?php if ($ehRendaFixaAtivo): ?>
+                                            <div class="ativo-dado">
+                                                <span>Valor aplicado</span>
+                                                <strong data-sensitive-value>
+                                                    <?= formatarMoeda($ativo["valor_investido"]) ?>
                                                 </strong>
-
-                                            <?php else: ?>
-
-                                                <strong class="indisponivel">
-                                                    Indisponível
+                                            </div>
+                                            <div class="ativo-dado">
+                                                <span>Saldo atual</span>
+                                                <strong data-sensitive-value>
+                                                    <?= formatarMoeda($ativo["valor_atual"]) ?>
                                                 </strong>
-
-                                            <?php endif; ?>
-
-                                        </div>
-
-
-                                        <div class="ativo-dado">
-
-                                            <span>
-                                                Valor atual
-                                            </span>
-
-                                            <?php if (
-                                                $ativo["valor_atual"]
-                                                !== null
-                                            ): ?>
-
-                                                <strong>
-
-                                                    <?= formatarMoeda(
-                                                        $ativo["valor_atual"]
-                                                    ) ?>
-
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="ativo-dado">
+                                                <span>Quantidade</span>
+                                                <strong data-sensitive-value>
+                                                    <?= formatarQuantidade($ativo["quantidade"]) ?>
                                                 </strong>
-
-                                            <?php else: ?>
-
-                                                <strong class="indisponivel">
-                                                    —
+                                            </div>
+                                            <div class="ativo-dado">
+                                                <span>Preço médio</span>
+                                                <strong data-sensitive-value>
+                                                    <?= formatarMoeda($ativo["preco_medio"]) ?>
                                                 </strong>
-
-                                            <?php endif; ?>
-
-                                        </div>
+                                            </div>
+                                            <div class="ativo-dado">
+                                                <span>Valor investido</span>
+                                                <strong data-sensitive-value>
+                                                    <?= formatarMoeda($ativo["valor_investido"]) ?>
+                                                </strong>
+                                            </div>
+                                            <div class="ativo-dado">
+                                                <span>
+                                                    <?= $ativo["preco_atual"] === null
+                                                        ? "Valor estimado pelo preço médio"
+                                                        : "Valor atual" ?>
+                                                </span>
+                                                <strong data-sensitive-value>
+                                                    <?= formatarMoeda($ativo["valor_atual"]) ?>
+                                                </strong>
+                                            </div>
+                                        <?php endif; ?>
 
 
                                         <a
@@ -546,16 +443,33 @@
                                             "descricao" => "Descrição",
                                             "quantidade" => "Quantidade",
                                             "preco_medio" => "Preço de compra",
+                                            "quantidade_comprada" => "Quantidade comprada",
+                                            "preco_compra" => "Preço de compra",
+                                            "quantidade_vendida" => "Quantidade vendida",
+                                            "preco_venda" => "Preço de venda",
+                                            "valor_adicionado" => "Valor adicionado",
+                                            "valor_resgatado" => "Valor resgatado",
                                             "data_compra" => "Data da compra",
+                                            "data_venda" => "Data da venda",
                                             "observacao" => "Observação",
                                         ];
-                                        $acaoExibida = $atividade["entidade"] === "Ativo"
-                                            ? ($atividade["acao"] === "criou"
-                                                ? "Compra"
-                                                : ($atividade["acao"] === "excluiu"
-                                                    ? "Venda"
-                                                    : ucfirst($atividade["acao"])))
-                                            : ucfirst($atividade["acao"]);
+                                        $ehRendaFixaDetalhe = is_array($detalhes)
+                                            && (
+                                                !empty($detalhes["renda_fixa"])
+                                                || !empty($detalhes["renda_fixa_nome"])
+                                            );
+                                        $acaoExibida = ucfirst($atividade["acao"]);
+                                        if ($atividade["entidade"] === "Ativo") {
+                                            if ($atividade["acao"] === "criou") {
+                                                $acaoExibida = "Compra";
+                                            } elseif ($atividade["acao"] === "excluiu") {
+                                                $acaoExibida = "Remoção";
+                                            } elseif (in_array($atividade["acao"], ["comprou", "vendeu"], true)) {
+                                                $acaoExibida = $atividade["acao"] === "comprou"
+                                                    ? "Compra"
+                                                    : "Venda";
+                                            }
+                                        }
                                     ?>
                                     <article class="item-historico-carteira">
                                         <span class="tipo-historico-carteira">
@@ -565,35 +479,78 @@
                                             <strong><?= htmlspecialchars($atividade["descricao"]) ?></strong>
                                             <?php if (is_array($detalhes)): ?>
                                                 <?php if (isset($detalhes["antes"]) && isset($detalhes["depois"])): ?>
-                                                    <div class="detalhes-historico">
+                                                    <div class="detalhes-historico" data-sensitive-value>
                                                         <?php foreach ($detalhes["depois"] as $chave => $valor): ?>
                                                             <?php
                                                                 $antes = $detalhes["antes"][$chave] ?? null;
                                                                 $rotulo = $rotulosDetalhes[$chave] ?? ucfirst(str_replace("_", " ", $chave));
+                                                                if ($ehRendaFixaDetalhe && $chave === "preco_medio") {
+                                                                    $rotulo = "Valor aplicado";
+                                                                }
                                                                 if ($antes == $valor) {
                                                                     continue;
                                                                 }
+                                                                $antesExibicao = $chave === "preco_medio"
+                                                                    ? formatarMoeda((float) $antes)
+                                                                    : (string) $antes;
+                                                                $valorExibicao = $chave === "preco_medio"
+                                                                    ? formatarMoeda((float) $valor)
+                                                                    : (string) $valor;
                                                             ?>
                                                             <span>
                                                                 <?= htmlspecialchars($rotulo) ?>:
-                                                                <b><?= htmlspecialchars((string) $antes) ?></b>
+                                                                <b><?= htmlspecialchars($antesExibicao) ?></b>
                                                                 →
-                                                                <b><?= htmlspecialchars(is_scalar($valor) ? (string) $valor : "") ?></b>
+                                                                <b><?= htmlspecialchars(is_scalar($valor) ? $valorExibicao : "") ?></b>
+                                                            </span>
+                                                        <?php endforeach; ?>
+                                                        <?php foreach ($detalhes as $chave => $valor): ?>
+                                                            <?php
+                                                                if (
+                                                                    in_array($chave, ["antes", "depois", "renda_fixa"], true)
+                                                                    || !array_key_exists($chave, $rotulosDetalhes)
+                                                                    || $valor === null
+                                                                    || $valor === ""
+                                                                ) {
+                                                                    continue;
+                                                                }
+                                                                $rotulo = $rotulosDetalhes[$chave];
+                                                                $valorExibicao = in_array(
+                                                                    $chave,
+                                                                    ["preco_compra", "preco_venda", "valor_adicionado", "valor_resgatado"],
+                                                                    true
+                                                                )
+                                                                    ? formatarMoeda((float) $valor)
+                                                                    : (string) $valor;
+                                                            ?>
+                                                            <span>
+                                                                <?= htmlspecialchars($rotulo) ?>:
+                                                                <b><?= htmlspecialchars($valorExibicao) ?></b>
                                                             </span>
                                                         <?php endforeach; ?>
                                                     </div>
                                                 <?php elseif (!empty($detalhes)): ?>
-                                                    <div class="detalhes-historico">
+                                                    <div class="detalhes-historico" data-sensitive-value>
                                                         <?php foreach ($detalhes as $chave => $valor): ?>
                                                             <?php
                                                                 if (!$chave || $valor === null || $valor === "") {
                                                                     continue;
                                                                 }
                                                                 $rotulo = $rotulosDetalhes[$chave] ?? ucfirst(str_replace("_", " ", $chave));
+                                                                if ($ehRendaFixaDetalhe && $chave === "preco_medio") {
+                                                                    $rotulo = "Valor aplicado";
+                                                                }
+                                                                $valorExibicao = in_array(
+                                                                    $chave,
+                                                                    ["preco_medio", "preco_compra", "preco_venda", "valor_adicionado", "valor_resgatado"],
+                                                                    true
+                                                                ) && is_numeric($valor)
+                                                                    ? formatarMoeda((float) $valor)
+                                                                    : (string) $valor;
                                                             ?>
                                                             <span>
                                                                 <?= htmlspecialchars($rotulo) ?>:
-                                                                <b><?= htmlspecialchars(is_scalar($valor) ? (string) $valor : "") ?></b>
+                                                                <b><?= htmlspecialchars(is_scalar($valor) ? $valorExibicao : "") ?></b>
                                                             </span>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -616,16 +573,13 @@
 
                     <?php if (
                         $totalAtivos > 0 &&
-                        $cotacoesDisponiveis < $totalAtivos
+                        $ativosSemCotacao > 0
                     ): ?>
 
                         <div class="aviso-cotacao">
-
-                            Algumas cotações não estão disponíveis
-                            no momento. Os ativos sem cotação atual
-                            não foram incluídos no valor atual da
-                            carteira.
-
+                            Algumas cotações não estão disponíveis.
+                            Para esses ativos, o valor atual foi estimado pelo preço médio;
+                            Renda Fixa considera o saldo aplicado.
                         </div>
 
                     <?php endif; ?>
